@@ -12,10 +12,13 @@ from fastapi import status
 from Backend.storage.events import get_events, set_events
 from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
 from Backend.calendar.cal_tools import create_recurring_events
+import logging
+from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
-from Backend.data.utils import add_new_medication  # NEW
+from Backend.data.utils import add_new_medication
 
 app = FastAPI(title="PillPal API", version="1.0.0")
+logger = logging.getLogger("api")
 
 allowed_origins = [
     "http://localhost:5173",
@@ -145,6 +148,21 @@ def get_calendar_events(calendar_id: str) -> dict:
             pass
         return {"events": []}
     except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/notifications")
+def list_notifications() -> dict:
+    """
+    Return dynamic notifications:
+      - reminder (blue): doses starting within the next 30 minutes
+      - low_stock (red): medications projected to run out within 7 days
+      - event_soon (blue): there is a medication today and an event within 3 hours
+    """
+    try:
+        return build_notifications()
+    except Exception as exc:
+        logger.exception("Failed to build notifications")
         raise HTTPException(status_code=500, detail=str(exc))
 
 
