@@ -36,6 +36,51 @@ except openai.OpenAIError as e:
     exit()
 
 
+# --- get_interaction_text (Unchanged) ---
+def get_interaction_text(drug_name: str) -> str | None:
+    """
+    Fetches the 'drug_interactions' section from openFDA for a given drug.
+    If not found, it falls back to the 'warnings' section.
+    """
+    print(f"🔄 Caching label for '{drug_name}'...")
+    url = "https://api.fda.gov/drug/label.json"
+    search_term = drug_name.upper()
+    params = {"search": f'openfda.generic_name:"{search_term}"', "limit": 1}
+
+    prepared_request = requests.Request("GET", url, params=params).prepare()
+    # print(f"🔍 Full API query URL: {prepared_request.url}") # Uncomment for debugging
+
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        if "results" in data and len(data["results"]) > 0:
+            result = data["results"][0]
+            # print(f"👀 JSON Preview (Top-level keys): {list(result.keys())}") # Uncomment for debugging
+
+            if "drug_interactions" in result:
+                # print("✅ Found dedicated 'drug_interactions' field.") # Uncomment for debugging
+                return " ".join(result["drug_interactions"])
+            elif "warnings" in result:
+                # print("⚠️ No 'drug_interactions' field found. Falling back to 'warnings' section.") # Uncomment for debugging
+                return " ".join(result["warnings"])
+            else:
+                print(
+                    f"❌ No 'drug_interactions' OR 'warnings' field found for '{drug_name}'."
+                )
+                return None
+        else:
+            print(f"❌ No drug label found for '{drug_name}'.")
+            return None
+    except requests.RequestException as e:
+        if e.response and e.response.status_code == 404:
+            print(f"❌ No drug label found for '{drug_name}' (404 Error).")
+        else:
+            print(f"HTTP Error: {e}")
+        return None
+
+
 # --- check_interaction_with_llm (Unchanged) ---
 def check_interaction_with_llm(
     interaction_text: str, drug_a_name: str, drug_b_name: str
