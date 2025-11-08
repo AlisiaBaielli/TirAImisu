@@ -3,7 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from Backend.storage.events import get_events, set_events
-from Backend.medications.repository import get_current_medications
+from Backend.medications.repository import get_current_medications, add_medication
+from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime, timedelta, date
+from Backend.calendar.cal_tools import create_recurring_events
 
 app = FastAPI(title="Prosus Calendar API", version="1.0.0")
 
@@ -83,6 +87,74 @@ def list_medications() -> dict:
     """
     meds = [m.to_dict() for m in get_current_medications()]
     return {"medications": meds}
+
+class MedicationCreate(BaseModel):
+    name: str = Field(..., min_length=1)
+    time: int = Field(..., ge=0, le=23)
+    color: str = Field("med-blue")
+    hour_interval: int = Field(24, ge=1)
+    description: Optional[str] = None
+    start_date: Optional[str] = None  # "YYYY-MM-DD"
+    end_date: Optional[str] = None    # "YYYY-MM-DD"
+    occurrences: Optional[int] = Field(None, ge=1)
+
+@app.post("/api/medications")
+def create_medication(payload: MedicationCreate) -> dict:
+    """
+    Append a new medication to the CSV store and return the created item.
+    """
+    med = add_medication(
+        name=payload.name.strip(),
+        time=payload.time,
+        color=payload.color.strip(),
+        hour_interval=payload.hour_interval,
+        description=payload.description.strip() if payload.description else None,
+    )
+
+    # Best-effort: create recurring calendar events
+    try:
+        calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
+        if calendar_id:
+            # Determine start datetime
+            if payload.start_date:
+                start_date_obj = datetime.strptime(payload.start_date, "%Y-%m-%d").date()
+            else:
+                start_date_obj = date.today()
+            start_dt = datetime(
+                year=start_date_obj.year,
+                month=start_date_obj.month,
+                day=start_date_obj.day,
+                hour=med.time,
+                minute=0,
+            )
+            end_dt = start_dt + timedelta(minutes=10)
+
+            # Determine occurrences
+            occ = payload.occurrences
+            if not occ and payload.end_date:
+                try:
+                    end_date_obj = datetime.strptime(payload.end_date, "%Y-%m-%d").date()
+                    total_hours = (datetime.combine(end_date_obj, datetime.min.time()) - datetime.combine(start_date_obj, datetime.min.time())).days * 24
+                    occ = max(1, (total_hours // med.hour_interval) + 1)
+                except Exception:
+                    occ = None
+            if not occ:
+                occ = 7  # default one week of occurrences
+
+            create_recurring_events(
+                calendar_id=calendar_id,
+                title=med.name,
+                start_dt=start_dt,
+                end_dt=end_dt,
+                occurrences=occ,
+                hour_interval=med.hour_interval,
+                description=med.description,
+                location=None,
+            )
+    except Exception:
+        # Do not fail the request if calendar creation fails
+        pass
+    return {"medication": med.to_dict()}
 
 
 # Optional: allow `python -m Backend.api.server` to run the dev server directly

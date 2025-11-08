@@ -35,13 +35,52 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
     toast.info("Camera feature will be available in a future update");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!manualEntry.name || !manualEntry.dosage) {
       toast.error("Please enter medication name and dosage");
       return;
     }
-    toast.success("Medication information saved");
-    onConfirm();
+    try {
+      const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+      const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
+      const name = `${manualEntry.name.trim()} ${manualEntry.dosage.trim()}`.trim();
+      const hour = (() => {
+        const [h] = manualEntry.time.split(":");
+        const n = parseInt(h || "8", 10);
+        if (Number.isNaN(n)) return 8;
+        return Math.max(0, Math.min(23, n));
+      })();
+      const hourInterval = manualEntry.frequency === "weekly" ? 168 : 24;
+      const body = {
+        name,
+        time: hour,
+        color: "med-blue",
+        hour_interval: hourInterval,
+        description: "Added via scan",
+        start_date: manualEntry.startDate || undefined,
+        end_date: manualEntry.endDate || undefined,
+        occurrences: manualEntry.numberOfPills ? parseInt(manualEntry.numberOfPills, 10) || undefined : undefined,
+      };
+      const res = await fetch(`${base}/api/medications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to add medication (${res.status})`);
+      }
+      // Refresh meds list
+      toast.success("Medication added");
+      window.dispatchEvent(new Event("medications:updated"));
+
+      // Best-effort refresh of calendar events cache
+      try {
+        await fetch(`${base}/api/calendar/${calendarId}/events/refresh`, { method: "POST" });
+      } catch {}
+      onConfirm();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to add medication");
+    }
   };
 
   return (

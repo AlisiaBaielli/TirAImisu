@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pill } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type Medication = {
   id: string | number;
@@ -22,24 +22,32 @@ const CurrentMedicationsList = () => {
     return `${display}:00 ${suffix}`;
   };
 
+  const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+
+  const load = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${base}/api/medications`);
+      if (!res.ok) throw new Error(`Failed to load medications (${res.status})`);
+      const data = await res.json();
+      setMedications(Array.isArray(data?.medications) ? data.medications : []);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load medications");
+    } finally {
+      setLoading(false);
+    }
+  }, [base]);
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-        const res = await fetch(`${base}/api/medications`);
-        if (!res.ok) throw new Error(`Failed to load medications (${res.status})`);
-        const data = await res.json();
-        setMedications(Array.isArray(data?.medications) ? data.medications : []);
-      } catch (e: any) {
-        setError(e?.message ?? "Failed to load medications");
-      } finally {
-        setLoading(false);
-      }
-    };
     load();
-  }, []);
+  }, [load]);
+
+  useEffect(() => {
+    const handler = () => load();
+    window.addEventListener("medications:updated", handler);
+    return () => window.removeEventListener("medications:updated", handler);
+  }, [load]);
 
   return (
     <Card className="animate-fade-in">
