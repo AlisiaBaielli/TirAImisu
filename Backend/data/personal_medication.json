@@ -13,7 +13,7 @@
             "08:00"
           ]
         },
-        "start_date": "2025-11-08"
+        "start_date": "2025-11-03"
       },
       {
         "drug_name": "Vitamin D",
@@ -26,7 +26,7 @@
             "12:00"
           ]
         },
-        "start_date": "2025-11-08"
+        "start_date": "2025-11-04"
       },
       {
         "drug_name": "Metformin",
@@ -34,64 +34,12 @@
         "quantity_left": 30,
         "dose_per_intake": 1,
         "schedule": {
-          "type": "daily",
+          "type": "weekly",
           "times": [
             "18:00"
           ]
         },
-        "start_date": "2025-11-08"
-      },
-      {
-        "drug_name": "AAAAA aaa",
-        "strength": "",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "16:00"
-          ]
-        },
-        "start_date": "2025-11-08"
-      },
-      {
-        "drug_name": "Test med",
-        "strength": "100mg",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "11:00"
-          ]
-        },
-        "start_date": "2025-11-08"
-      },
-      {
-        "drug_name": "test2",
-        "strength": "100mg",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "19:00"
-          ]
-        },
-        "start_date": "2025-11-08"
-      },
-      {
-        "drug_name": "test3",
-        "strength": "100mg",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "22:00"
-          ]
-        },
-        "start_date": "2025-11-10"
+        "start_date": "2025-11-05"
       }
     ]
   },
@@ -109,7 +57,20 @@
             "09:00"
           ]
         },
-        "start_date": "2025-02-01"
+        "start_date": "2025-11-01"
+      },
+      {
+        "drug_name": "Vitamin C",
+        "strength": "2000IU",
+        "quantity_left": 30,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": [
+            "12:00"
+          ]
+        },
+        "start_date": "2025-11-01"
       }
     ]
   }

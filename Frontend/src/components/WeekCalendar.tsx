@@ -22,12 +22,14 @@ interface CalendarChip {
 
 const WeekCalendar = () => {
   const today = new Date();
-  const weekStart = addDays(startOfWeek(today, { weekStartsOn: 1 }), 7);
+  // Current week start (Monday) – removed +7 jump
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 });
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const [events, setEvents] = useState<ApiEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
   const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
@@ -39,7 +41,6 @@ const WeekCalendar = () => {
         fetch(`${baseUrl}/api/events-calendar/events`),
         fetch(`${baseUrl}/api/medications/events`),
       ]);
-
       const extraJson = resExtra.ok ? await resExtra.json() : { events: [] };
       const medsJson = resMeds.ok ? await resMeds.json() : { events: [] };
       const merged = [
@@ -73,7 +74,11 @@ const WeekCalendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const colorPalette = useMemo(() => ["bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500"], []);
+  const colorPalette = useMemo(
+    () => ["bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500", "bg-pink-500", "bg-yellow-500"],
+    []
+  );
+
   const hashString = (s: string) => {
     let h = 0;
     for (let i = 0; i < s.length; i++) {
@@ -84,42 +89,42 @@ const WeekCalendar = () => {
   };
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
   return (
-    <Card className="h-[calc(100vh-180px)]">
-      <CardHeader>
+    <Card className="flex flex-col h-full">
+      <CardHeader className="pb-2 shrink-0">
         <div className="flex items-center justify-between gap-2">
-          <CardTitle>7-Day Medication Schedule</CardTitle>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={refreshEvents} disabled={loading}>
-              {loading ? "Refreshing..." : "Refresh"}
-            </Button>
-          </div>
+          <CardTitle className="text-lg font-medium">7-Day Medication Schedule</CardTitle>
+          <Button variant="outline" size="sm" onClick={refreshEvents} disabled={loading}>
+            {loading ? "Refreshing..." : "Refresh"}
+          </Button>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 p-0 min-h-0">
-        <div className="h-full overflow-auto">
+
+      <CardContent className="flex-1 p-0 min-h-0 flex flex-col">
+        {/* Scrollable interior; header row sticky */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="min-w-[800px]">
+            {/* Day headers */}
             <div className="grid grid-cols-8 border-b sticky top-0 bg-card z-10">
               <div className="p-2 border-r text-xs font-medium text-muted-foreground">Time</div>
-              {days.map((day, index) => (
-                <div
-                  key={index}
-                  className={`p-2 border-r text-center ${
-                    format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd") ? "bg-primary/5" : ""
-                  }`}
-                >
-                  <div className="text-xs font-medium">{format(day, "EEE")}</div>
-                  <div className={`text-lg font-semibold ${
-                    format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd") ? "text-primary" : ""
-                  }`}>
-                    {format(day, "d")}
+              {days.map((day, index) => {
+                const isToday = format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
+                return (
+                  <div
+                    key={index}
+                    className={`p-2 border-r text-center ${isToday ? "bg-primary/5" : ""}`}
+                  >
+                    <div className="text-xs font-medium">{format(day, "EEE")}</div>
+                    <div className={`text-lg font-semibold ${isToday ? "text-primary" : ""}`}>
+                      {format(day, "d")}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
+            {/* Hour rows */}
             {hours.map((hour) => (
               <div key={hour} className="grid grid-cols-8 border-b min-h-[60px]">
                 <div className="p-2 border-r text-xs text-muted-foreground">
@@ -139,22 +144,22 @@ const WeekCalendar = () => {
                         name: ev.title ?? "Event",
                         time: format(start, "HH:mm"),
                         color,
-                      frequency: "once",
-                      startDate: format(start, "yyyy-MM-dd"),
+                        frequency: "once",
+                        startDate: format(start, "yyyy-MM-dd"),
                       };
                     });
+
+                  const isToday = format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
 
                   return (
                     <div
                       key={dayIndex}
-                      className={`p-1 border-r relative ${
-                        format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd") ? "bg-primary/5" : ""
-                      }`}
+                      className={`p-1 border-r relative ${isToday ? "bg-primary/5/50" : ""}`}
                     >
                       {hourEvents.map((event) => (
                         <div
                           key={event.id}
-                          className={`${event.color} text-white rounded px-2 py-1 mb-1 text-xs font-medium cursor-pointer transition hover:scale-105 hover:shadow-lg`}
+                          className={`${event.color} text-white rounded px-2 py-1 mb-1 text-[10px] font-medium cursor-pointer transition hover:scale-105 hover:shadow-lg`}
                           onClick={() => setSelectedMed(event)}
                         >
                           {event.name}
@@ -166,13 +171,8 @@ const WeekCalendar = () => {
               </div>
             ))}
 
-            {/* Loading / error states */}
-            {loading && (
-              <div className="p-3 text-xs text-muted-foreground">Loading events…</div>
-            )}
-            {error && !loading && (
-              <div className="p-3 text-xs text-red-500">Error: {error}</div>
-            )}
+            {loading && <div className="p-3 text-xs text-muted-foreground">Loading events…</div>}
+            {error && !loading && <div className="p-3 text-xs text-red-500">Error: {error}</div>}
           </div>
         </div>
       </CardContent>
@@ -182,7 +182,7 @@ const WeekCalendar = () => {
           <DialogHeader>
             <DialogTitle>{selectedMed?.name}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-2">
+          <div className="space-y-2 text-sm">
             <div><strong>Time:</strong> {selectedMed?.time}</div>
             <div><strong>Frequency:</strong> {selectedMed?.frequency}</div>
             <div><strong>Start Date:</strong> {selectedMed?.startDate}</div>
