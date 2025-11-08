@@ -33,6 +33,6 @@ numpy
 openai==1.66.3
 orjson==3.10.15
 packaging==24.2
-pandas
+pandas==2.2.3
 prompt_toolkit==3.0.50
-uvicorn
+opencv-python
