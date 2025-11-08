@@ -283,10 +283,13 @@ def refresh_events_calendar_events() -> dict:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@app.post("/api/buy/{drug_name}")
-async def buy(drug_name: str):
-    result = await run_checkout("1", drug_name)
-    return result
+@app.post("/api/buy")
+async def buy(data: dict):
+    drug_name = data.get("drug_name")
+    if not drug_name:
+        raise HTTPException(status_code=400, detail="drug_name is required")
+    result = await run_checkout(user_id="1", drug_name=drug_name)
+    return {"ok": True, "ordered": drug_name, "result": result}
 
 
 # ─────────── Camera scan endpoint persists result using utils ─────────── #

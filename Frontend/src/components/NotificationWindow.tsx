@@ -81,35 +81,26 @@ const NotificationWindow = () => {
 const [orderingIds, setOrderingIds] = useState<Set<string>>(new Set());
 
 const handleOrder = async (n: NotificationItem) => {
-  const medName = n?.metadata?.medicationName || n.title || "";
-  if (!medName) {
-    toast.error("Could not determine medication to order.");
-    return;
-  }
+  const medName = n?.metadata?.medicationName;
+  if (!medName) return toast.error("No medication name found");
 
-  // mark this specific card as ordering
   setOrderingIds(prev => new Set(prev).add(n.id));
-
   try {
-    const res = await fetch(
-      `${baseUrl}/api/buy/${encodeURIComponent(medName)}`,
-      { method: "POST" }
-    );
+    const res = await fetch(`${baseUrl}/api/buy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ drug_name: medName }),
+    });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err?.detail || `Failed to order (${res.status})`);
+      throw new Error(err?.detail || `Order failed (${res.status})`);
     }
     const data = await res.json();
-    // Dismiss only on success
+    toast.success(`Order started for ${data.ordered}.`);
     setDismissed(prev => new Set(prev).add(n.id));
-
-    toast.success(`Order started for ${data?.drug_name || medName}.`);
-    // (Optional) you can surface a summary from data.result if you return one.
-
   } catch (e: any) {
-    toast.error(e?.message || "Failed to place order.");
+    toast.error(e.message || "Failed to place order.");
   } finally {
-    // clear the ordering state for this card
     setOrderingIds(prev => {
       const next = new Set(prev);
       next.delete(n.id);
@@ -117,6 +108,7 @@ const handleOrder = async (n: NotificationItem) => {
     });
   }
 };
+
   const handleDismiss = (n: NotificationItem) => {
     setDismissed((prev) => new Set(prev).add(n.id));
     toast.info("Reminder dismissed.");

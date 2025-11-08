@@ -98,19 +98,9 @@ def find_medication_entry(user_id: str, drug_name: str) -> dict:
     raise ValueError(f"Medication '{drug_name}' not found. Available: {available}")
 
 
-async def run_checkout(user_id: str = "1", drug_name: str = ""):
-    """Main function: called from frontend or CLI. Always quantity=1."""
-    if not drug_name:
-        raise ValueError("You must provide a drug_name, e.g. 'Aspirin'.")
-
+async def run_checkout(user_id: str, drug_name: str):
     user = load_user(user_id)
-    med = find_medication_entry(user_id, drug_name)
-
-    # Build product search string: "Aspirin 100mg"
-    strength = med.get("strength", "").strip()
-    product_name = f"{drug_name} {strength}".strip()
-
-    product = {"name": product_name, "quantity": 1}
+    product = {"name": drug_name, "quantity": 1}
 
     browser = Browser()
     llm = ChatBrowserUse()
@@ -120,7 +110,6 @@ async def run_checkout(user_id: str = "1", drug_name: str = ""):
         llm=llm,
         browser=browser,
     )
-
     history = await agent.run()
     return history
 
