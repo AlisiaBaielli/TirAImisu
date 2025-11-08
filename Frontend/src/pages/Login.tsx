@@ -3,9 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Pill } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -14,13 +20,10 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!username || !password) {
       toast.error("Please enter both username and password");
       return;
     }
-
-    // Mock login - in production, this would authenticate with backend
     localStorage.setItem("isAuthenticated", "true");
     localStorage.setItem("username", username);
     toast.success("Login successful!");
@@ -31,12 +34,16 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/10 animate-fade-in">
       <Card className="w-full max-w-md mx-4 shadow-lg animate-scale-in">
         <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-primary/10">
-              <Pill className="h-10 w-10 text-primary" />
-            </div>
+          <div className="flex justify-center items-center gap-3 mb-4">
+            <img
+              src={logo}
+              alt="PillPal logo"
+              className="h-16 w-16 rounded-lg"
+            />
+            <CardTitle className="text-3xl font-bold text-primary">
+              PillPal
+            </CardTitle>
           </div>
-          <CardTitle className="text-3xl font-bold">PillPal</CardTitle>
           <CardDescription>Sign in to manage your medications</CardDescription>
         </CardHeader>
         <CardContent>
@@ -63,7 +70,7 @@ const Login = () => {
                 className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full h-11 text-base hover-scale">
+            <Button type="submit" className="w-full h-11 text-base">
               Sign In
             </Button>
           </form>
