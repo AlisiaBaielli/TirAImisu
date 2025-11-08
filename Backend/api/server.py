@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from Backend.storage.events import get_events, set_events
-from Backend.medications.repository import get_current_medications, add_medication
+from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timedelta, date
@@ -157,6 +157,15 @@ def create_medication(payload: MedicationCreate) -> dict:
         # Do not fail the request if calendar creation fails
         pass
     return {"medication": med.to_dict()}
+
+@app.get("/api/medications/events")
+def list_medication_events() -> dict:
+    """
+    Return medication-derived events generated from personal_medication.json
+    (expanded with start_date and quantity_left).
+    """
+    events = get_medication_events()
+    return {"events": events}
 
 @app.get("/api/events-calendar/events")
 def get_events_calendar_events() -> dict:

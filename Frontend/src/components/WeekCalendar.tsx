@@ -30,22 +30,21 @@ const WeekCalendar = () => {
   const [error, setError] = useState<string | null>(null);
 
   const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-  const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
 
   const fetchEvents = async () => {
     try {
       setLoading(true);
       setError(null);
-      const [resMain, resExtra] = await Promise.all([
-        fetch(`${baseUrl}/api/calendar/${calendarId}/events`),
+      const [resExtra, resMeds] = await Promise.all([
         fetch(`${baseUrl}/api/events-calendar/events`),
+        fetch(`${baseUrl}/api/medications/events`),
       ]);
 
-      const mainJson = resMain.ok ? await resMain.json() : { events: [] };
       const extraJson = resExtra.ok ? await resExtra.json() : { events: [] };
+      const medsJson = resMeds.ok ? await resMeds.json() : { events: [] };
       const merged = [
-        ...(Array.isArray(mainJson?.events) ? mainJson.events : []),
         ...(Array.isArray(extraJson?.events) ? extraJson.events : []),
+        ...(Array.isArray(medsJson?.events) ? medsJson.events : []),
       ];
       setEvents(merged);
     } catch (e: any) {
@@ -59,11 +58,8 @@ const WeekCalendar = () => {
     try {
       setLoading(true);
       setError(null);
-      const [r1, r2] = await Promise.all([
-        fetch(`${baseUrl}/api/calendar/${calendarId}/events/refresh`, { method: "POST" }),
-        fetch(`${baseUrl}/api/events-calendar/events/refresh`, { method: "POST" }),
-      ]);
-      if (!r1.ok && !r2.ok) throw new Error("Failed to refresh events");
+      const r = await fetch(`${baseUrl}/api/events-calendar/events/refresh`, { method: "POST" });
+      if (!r.ok) throw new Error("Failed to refresh events");
       await fetchEvents();
     } catch (e: any) {
       setError(e?.message ?? "Failed to refresh events");

@@ -2,6 +2,7 @@ from typing import List, Optional, Dict, Any
 from Backend.medications.medication import Medication
 import os
 import json
+from datetime import datetime, timedelta, date
 
 
 def _get_personal_json_path() -> str:
@@ -181,3 +182,91 @@ def add_medication(
         hour_interval=int(hour_interval),
         description=description,
     )
+
+
+def get_medication_events() -> List[Dict[str, Any]]:
+    """
+    Expand medications from personal_medication.json into event-like objects:
+    { title, start: { date_time }, end: { date_time } }
+    Using:
+      - hour from schedule ('times'[0] or 'time')
+      - start_date for the first occurrence
+      - quantity_left as the number of occurrences
+      - daily -> +24h; weekly -> +168h between occurrences
+      - duration 10 minutes
+    """
+    json_path = _get_personal_json_path()
+    user_id = _get_user_id()
+    doc = _load_json(json_path)
+
+    user_entry = next((u for u in doc if str(u.get("user_id")) == str(user_id)), None)
+    if not user_entry:
+        return []
+
+    meds_json = user_entry.get("medications", []) or []
+    results: List[Dict[str, Any]] = []
+
+    def parse_time_to_hour(val: str) -> int:
+        try:
+            hh = int((val or "0").split(":")[0])
+            return max(0, min(23, hh))
+        except Exception:
+            return 8
+
+    for m in meds_json:
+        drug_name = str(m.get("drug_name", "")).strip()
+        strength = str(m.get("strength", "")).strip()
+        schedule = m.get("schedule") or {}
+        sched_type = str(schedule.get("type", "daily")).lower()
+        qty_left = m.get("quantity_left", 1)
+        try:
+            occurrences = max(1, int(qty_left))
+        except Exception:
+            occurrences = 1
+
+        hour_interval = 24
+        time_hour = 8
+        if sched_type == "daily":
+            times = schedule.get("times") or []
+            if isinstance(times, list) and times:
+                time_hour = parse_time_to_hour(times[0])
+            hour_interval = 24
+        elif sched_type == "weekly":
+            time_str = schedule.get("time") or "08:00"
+            time_hour = parse_time_to_hour(time_str)
+            hour_interval = 168
+        else:
+            time_hour = 8
+            hour_interval = 24
+
+        start_date_str = m.get("start_date")
+        if start_date_str:
+            try:
+                start_date_obj = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            except Exception:
+                start_date_obj = date.today()
+        else:
+            start_date_obj = date.today()
+
+        base_start = datetime(
+            year=start_date_obj.year,
+            month=start_date_obj.month,
+            day=start_date_obj.day,
+            hour=time_hour,
+            minute=0,
+        )
+        title = f"{drug_name} {strength}".strip()
+
+        for i in range(occurrences):
+            start_dt = base_start + timedelta(hours=i * hour_interval)
+            end_dt = start_dt + timedelta(minutes=10)
+            results.append(
+                {
+                    "id": f"med-{drug_name}-{i}-{int(start_dt.timestamp())}",
+                    "title": title or "Medication",
+                    "start": {"date_time": start_dt.isoformat()},
+                    "end": {"date_time": end_dt.isoformat()},
+                }
+            )
+
+    return results
