@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timedelta, date
 from Backend.calendar.cal_tools import create_recurring_events
+from fastapi import status
 
 app = FastAPI(title="Prosus Calendar API", version="1.0.0")
 
@@ -109,6 +110,7 @@ def create_medication(payload: MedicationCreate) -> dict:
         color=payload.color.strip(),
         hour_interval=payload.hour_interval,
         description=payload.description.strip() if payload.description else None,
+        start_date=payload.start_date,
     )
 
     # Best-effort: create recurring calendar events
@@ -155,6 +157,52 @@ def create_medication(payload: MedicationCreate) -> dict:
         # Do not fail the request if calendar creation fails
         pass
     return {"medication": med.to_dict()}
+
+@app.get("/api/events-calendar/events")
+def get_events_calendar_events() -> dict:
+    """
+    Return cached events for the EVENTS_CALENDAR_ID specified in the backend environment.
+    Falls back to best-effort live fetch when cache is empty.
+    """
+    calendar_id = os.getenv("EVENTS_CALENDAR_ID")
+    if not calendar_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+    try:
+        events = get_events(calendar_id)
+        if events:
+            return {"events": events}
+        # Best-effort live fetch if cache empty
+        try:
+            from Backend.calendar.cal_api import list_events as live_list_events
+            live = live_list_events(calendar_id)
+            if isinstance(live, list):
+                set_events(calendar_id, live)
+                return {"events": live}
+        except Exception:
+            pass
+        return {"events": []}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+@app.post("/api/events-calendar/events/refresh")
+def refresh_events_calendar_events() -> dict:
+    """
+    Force refresh for EVENTS_CALENDAR_ID and persist to cache.
+    """
+    calendar_id = os.getenv("EVENTS_CALENDAR_ID")
+    if not calendar_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+    try:
+        from Backend.calendar.cal_api import list_events as live_list_events
+        live = live_list_events(calendar_id)
+        if not isinstance(live, list):
+            raise HTTPException(status_code=502, detail="Invalid events format from upstream")
+        set_events(calendar_id, live)
+        return {"events": live}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
 
 # Optional: allow `python -m Backend.api.server` to run the dev server directly

@@ -36,12 +36,18 @@ const WeekCalendar = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events`);
-      if (!res.ok) {
-        throw new Error(`Failed to load events (${res.status})`);
-      }
-      const data = await res.json();
-      setEvents(Array.isArray(data?.events) ? data.events : []);
+      const [resMain, resExtra] = await Promise.all([
+        fetch(`${baseUrl}/api/calendar/${calendarId}/events`),
+        fetch(`${baseUrl}/api/events-calendar/events`),
+      ]);
+
+      const mainJson = resMain.ok ? await resMain.json() : { events: [] };
+      const extraJson = resExtra.ok ? await resExtra.json() : { events: [] };
+      const merged = [
+        ...(Array.isArray(mainJson?.events) ? mainJson.events : []),
+        ...(Array.isArray(extraJson?.events) ? extraJson.events : []),
+      ];
+      setEvents(merged);
     } catch (e: any) {
       setError(e?.message ?? "Failed to load events");
     } finally {
@@ -53,12 +59,11 @@ const WeekCalendar = () => {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events/refresh`, {
-        method: "POST",
-      });
-      if (!res.ok) {
-        throw new Error(`Failed to refresh events (${res.status})`);
-      }
+      const [r1, r2] = await Promise.all([
+        fetch(`${baseUrl}/api/calendar/${calendarId}/events/refresh`, { method: "POST" }),
+        fetch(`${baseUrl}/api/events-calendar/events/refresh`, { method: "POST" }),
+      ]);
+      if (!r1.ok && !r2.ok) throw new Error("Failed to refresh events");
       await fetchEvents();
     } catch (e: any) {
       setError(e?.message ?? "Failed to refresh events");

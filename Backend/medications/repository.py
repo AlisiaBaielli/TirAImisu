@@ -119,7 +119,14 @@ def _next_id(existing: List[Medication]) -> str:
     return str(max_id + 1)
 
 
-def add_medication(name: str, time: int, color: str, hour_interval: int, description: Optional[str] = None) -> Medication:
+def add_medication(
+    name: str,
+    time: int,
+    color: str,
+    hour_interval: int,
+    description: Optional[str] = None,
+    start_date: Optional[str] = None,
+) -> Medication:
     """
     Append a new medication to the personal_medication.json under the selected user and return the created Medication.
     The JSON entry will be normalized with:
@@ -156,7 +163,7 @@ def add_medication(name: str, time: int, color: str, hour_interval: int, descrip
         "quantity_left": 30,
         "dose_per_intake": 1,
         "schedule": schedule,
-        "start_date": os.getenv("PERSONAL_MED_START_DATE", "2025-11-08"),
+        "start_date": start_date or os.getenv("PERSONAL_MED_START_DATE", "2025-11-08"),
     }
     meds.append(new_entry)
     user_entry["medications"] = meds

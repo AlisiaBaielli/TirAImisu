@@ -9,7 +9,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["08:00"]
+          "times": [
+            "08:00"
+          ]
         },
         "start_date": "2025-11-08"
       },
@@ -20,7 +22,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["12:00"]
+          "times": [
+            "12:00"
+          ]
         },
         "start_date": "2025-11-08"
       },
@@ -31,7 +35,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["18:00"]
+          "times": [
+            "18:00"
+          ]
         },
         "start_date": "2025-11-08"
       },
@@ -42,7 +48,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["16:00"]
+          "times": [
+            "16:00"
+          ]
         },
         "start_date": "2025-11-08"
       },
@@ -53,7 +61,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["11:00"]
+          "times": [
+            "11:00"
+          ]
         },
         "start_date": "2025-11-08"
       },
@@ -64,9 +74,24 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["19:00"]
+          "times": [
+            "19:00"
+          ]
         },
         "start_date": "2025-11-08"
+      },
+      {
+        "drug_name": "test3",
+        "strength": "100mg",
+        "quantity_left": 30,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": [
+            "22:00"
+          ]
+        },
+        "start_date": "2025-11-10"
       }
     ]
   },
@@ -80,7 +105,9 @@
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
-          "times": ["09:00"]
+          "times": [
+            "09:00"
+          ]
         },
         "start_date": "2025-02-01"
       }
