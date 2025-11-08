@@ -12,18 +12,7 @@ import logging
 
 from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
-<<<<<<< HEAD
-from Backend.medications.repository import (
-    get_current_medications,
-    add_medication,
-    get_medication_events,
-)
-from pydantic import BaseModel, Field
-from typing import Optional
-from datetime import datetime, timedelta, date
-=======
 from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
->>>>>>> b4eeaf1e70144e92517079368b193f854d0dd36e
 from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
@@ -63,24 +52,6 @@ def _load_json(name: str) -> Any:
         raise HTTPException(status_code=500, detail=f"Invalid JSON in {name}: {exc}")
 
 
-<<<<<<< HEAD
-def _hash_color(name: str) -> str:
-    colors = [
-        "med-blue",
-        "med-green",
-        "med-orange",
-        "med-purple",
-        "med-pink",
-        "med-yellow",
-    ]
-    h = 0
-    for ch in name:
-        h = (h * 31 + ord(ch)) & 0xFFFFFFFF
-    return colors[h % len(colors)]
-
-
-=======
->>>>>>> b4eeaf1e70144e92517079368b193f854d0dd36e
 def _format_frequency(schedule: Dict[str, Any]) -> str:
     t = (schedule or {}).get("type")
     if t == "daily":
@@ -306,12 +277,6 @@ async def buy(drug_name: str):
     return result
 
 
-# Optional: allow `python -m Backend.api.server` to run the dev server directly
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("Backend.api.server:app", host="0.0.0.0", port=8000, reload=True)
-    
 # ─────────── Camera scan endpoint persists result using utils ─────────── #
 class CameraScanRequest(BaseModel):
     user_id: str
