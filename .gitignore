@@ -1,0 +1,53 @@
+# ─────────────────────────────
+# Environment & secrets
+# ─────────────────────────────
+.env
+.env.*
+*.env
+!example.env        # keep a template if you want
+
+# ─────────────────────────────
+# Python
+# ─────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.db
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Unit test / coverage reports
+.coverage
+coverage.xml
+htmlcov/
+pytest_cache/
+
+# Logs
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ─────────────────────────────
+# Dependencies / package managers
+# ─────────────────────────────
+poetry.lock
+Pipfile.lock
+
+# ─────────────────────────────
+# OS / Editor files
+# ─────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
