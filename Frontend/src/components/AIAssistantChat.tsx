@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot, Send } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
   id: number;
@@ -20,65 +19,65 @@ const AIAssistantChat = () => {
     },
   ]);
   const [input, setInput] = useState("");
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   const handleSend = () => {
     if (!input.trim()) return;
-
     const userMessage: Message = {
       id: messages.length + 1,
       text: input,
       sender: "user",
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-
-    // Simulate AI response
     setTimeout(() => {
       const assistantMessage: Message = {
-        id: messages.length + 2,
-        text: "I understand your question. Let me help you with that medication information.",
+        id: userMessage.id + 1,
+        text: "Thanks. I will process that and give you info shortly.",
         sender: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-    }, 1000);
+    }, 700);
   };
 
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <Card className="h-[400px] flex flex-col">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium flex items-center gap-2">
-          <Bot className="h-4 w-4 text-primary" />
-          AI Assistant
-        </CardTitle>
+    <Card className="flex flex-col h-full rounded-xl shadow bg-white">
+      <CardHeader className="pb-2 shrink-0">
+        <div className="flex w-full flex-row items-center justify-center gap-2">
+          <Bot className="h-5 w-5 text-primary" />
+          <CardTitle className="text-lg font-medium">AI Assistant</CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea className="flex-1 px-4">
-          <div className="space-y-4 pb-4">
-            {messages.map((message) => (
+      <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
+          {messages.map((m) => (
+            <div
+              key={m.id}
+              className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
+            >
               <div
-                key={message.id}
-                className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+                className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
+                  m.sender === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground"
+                }`}
               >
-                <div
-                  className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
-                    message.sender === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  {message.text}
-                </div>
+                {m.text}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
-        <div className="p-4 border-t">
+            </div>
+          ))}
+          <div ref={endRef} />
+        </div>
+        <div className="p-3 border-t shrink-0">
           <div className="flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSend()}
+              onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Ask about medications..."
               className="flex-1"
             />

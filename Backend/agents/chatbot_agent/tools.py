@@ -13,6 +13,21 @@ from logger import logger  # ✅ import your custom logger
 
 
 @tool
+def get_user_id() -> List[Dict[str, Any]]:
+    """
+    Return the list of medications a user is currently taking.
+    Each medication has: {name, strength, sig}.
+    """
+    logger.log_tool_call("get_user_id", {})
+
+    # meds = db_get_user_meds(user_id)
+    id = "user_12345"
+
+    logger.log_tool_result("get_user_id", id)
+    return id
+
+
+@tool
 def get_current_meds(user_id: str) -> List[Dict[str, Any]]:
     """
     Return the list of medications a user is currently taking.
@@ -20,7 +35,11 @@ def get_current_meds(user_id: str) -> List[Dict[str, Any]]:
     """
     logger.log_tool_call("get_current_meds", {"user_id": user_id})
 
-    # meds = db_get_user_meds(user_id)
+    # meds = db_get_user_meds(user_id)\
+    meds = [
+        {"name": "Aspirin", "strength": "81 mg", "sig": "once daily"},
+        {"name": "Lisinopril", "strength": "10 mg", "sig": "once daily"},
+    ]
 
     logger.log_tool_result("get_current_meds", meds)
     return meds
