@@ -7,6 +7,8 @@ Includes logging via logger.py.
 
 from typing import List, Dict, Any
 from langchain_core.tools import tool
+from calendar.cal_api import list_events
+from data.utils import retrieve_medications
 
 # from db import db_get_user_meds, db_check_pair_interaction
 from logger import logger  # ✅ import your custom logger
@@ -34,50 +36,48 @@ def get_current_meds(user_id: str) -> List[Dict[str, Any]]:
     Each medication has: {name, strength, sig}.
     """
     logger.log_tool_call("get_current_meds", {"user_id": user_id})
-
-    # meds = db_get_user_meds(user_id)\
-    meds = [
-        {"name": "Aspirin", "strength": "81 mg", "sig": "once daily"},
-        {"name": "Lisinopril", "strength": "10 mg", "sig": "once daily"},
-    ]
-
+    meds = retrieve_medications(user_id)
     logger.log_tool_result("get_current_meds", meds)
     return meds
 
 
-@tool
-def check_interaction(drug_a: str, drug_b: str) -> Dict[str, Any]:
-    """
-    Check whether two medications interact.
-    Returns structure:
-        {
-            "risk": "none" | "caution" | "contraindicated",
-            "mechanism": "...",
-            "recommendation": "...",
-            "sources": [...]
-        }
-    If no interaction exists, 'risk' will be "none".
-    """
-    logger.log_tool_call("check_interaction", {"drug_a": drug_a, "drug_b": drug_b})
+# @tool
+# def check_interaction(drug_a: str, drug_b: str) -> Dict[str, Any]:
+#     """
+#     Check whether two medications interact.
+#     Returns structure:
+#         {
+#             "risk": "none" | "caution" | "contraindicated",
+#             "mechanism": "...",
+#             "recommendation": "...",
+#             "sources": [...]
+#         }
+#     If no interaction exists, 'risk' will be "none".
+#     """
+#     logger.log_tool_call("check_interaction", {"drug_a": drug_a, "drug_b": drug_b})
 
-    # result = db_check_pair_interaction(drug_a, drug_b)
+#     # result = db_check_pair_interaction(drug_a, drug_b)
 
-    if result is None:
-        result = {
-            "risk": "none",
-            "mechanism": "No known interaction in database.",
-            "recommendation": "Standard use.",
-            "sources": [],
-        }
+#     if result is None:
+#         result = {
+#             "risk": "none",
+#             "mechanism": "No known interaction in database.",
+#             "recommendation": "Standard use.",
+#             "sources": [],
+#         }
 
-    logger.log_tool_result("check_interaction", result)
-    return result
+#     logger.log_tool_result("check_interaction", result)
+#     return result
 
 
 @tool  # ALREADY EXISTS
 def get_calendar_events() -> Dict[str, Any]:
-    return
+    """Get calendar events for the user. Here you can check if any of the events are related to drinking or driving
+    based on that and the medications they have taken you can provide advice to the user.
+    """
+
+    return list_events()
 
 
 # Export list for create_react_agent()
-TOOLS = [get_current_meds, check_interaction]
+TOOLS = [get_current_meds, get_calendar_events]
