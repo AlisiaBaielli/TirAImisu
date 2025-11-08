@@ -3,9 +3,12 @@ import os
 import shutil
 from typing import List, Dict, Any
 
+# Get the absolute path of the directory this script (utils.py) is in
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Define file paths
-MEDICATION_FILE = "personal_medication.json"
-USER_DATA_FILE = "personal_data.json"
+MEDICATION_FILE = os.path.join(SCRIPT_DIR, "personal_medication.json")
+USER_DATA_FILE = os.path.join(SCRIPT_DIR, "personal_data.json")
 
 
 def _read_json(filepath: str) -> List[Dict[str, Any]]:
@@ -35,6 +38,7 @@ def _write_to_json(filepath: str, data: List[Dict[str, Any]]) -> bool:
 
 def retrieve_medications(user_id: str) -> List[Dict[str, Any]]:
     all_med_data = _read_json(MEDICATION_FILE)
+    print("All med data: ", all_med_data)
 
     for user_data in all_med_data:
         if user_data.get("user_id") == user_id:

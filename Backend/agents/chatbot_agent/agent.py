@@ -23,12 +23,11 @@ dotenv.load_dotenv()
 
 SYSTEM_PROMPT = SystemMessage(
     content=(
-        "You are a medication assistant. Be concise and safe.\n"
-        "- You can look up the user's current medications with the tool `get_current_meds(user_id)`.\n"
-        "- You can check if two drugs interact using `check_interaction(drug_a, drug_b)`.\n"
+        "You are a mock medication assistant. Be informative and use tools when possible\n"
+        "- You can look up the user's current medications with the tool `get_current_meds(user_id)` please always do so to see the user's current medications.\n"
+        "- You can check the side effects of a tool using `check_side_effects(drug)`.\n"
         "- If the user asks about interactions, prefer calling the interaction tool rather than guessing.\n"
-        "- If you need the user's id to look up meds and it wasn't provided, ask for it explicitly.\n"
-        "- If no interaction is found, clearly say so and recommend consulting a clinician for definitive guidance.\n"
+        "- If no interaction is found, clearly say so.\n"
     )
 )
 
@@ -51,7 +50,7 @@ class ChatAgent:
         """
         Synchronous call: send a user message and return the final assistant text.
         """
-        logger.log_agent("-> user: " + text)
+        logger.log_user_input(text)
         events = self.graph.stream(
             {"messages": [HumanMessage(content=text)]},
             config={"thread_id": thread_id or "default"},
