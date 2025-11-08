@@ -4,6 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+// Medication type for color mapping
+interface Medication {
+  id: string | number;
+  name: string;
+  color: string;
+}
+
 type ApiEvent = {
   id?: string;
   title: string;
@@ -22,7 +29,6 @@ interface CalendarChip {
 
 const WeekCalendar = () => {
   const today = new Date();
-  // Current week start (Monday) – removed +7 jump
   const weekStart = startOfWeek(today, { weekStartsOn: 1 });
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
@@ -31,8 +37,12 @@ const WeekCalendar = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
+  // Medications for color mapping
+  const [medications, setMedications] = useState<Medication[]>([]);
+
   const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
+  // Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
@@ -55,6 +65,20 @@ const WeekCalendar = () => {
     }
   };
 
+  // Fetch medications for color mapping
+  const fetchMedications = async () => {
+    try {
+      const userId = localStorage.getItem("userId") || "1";
+      const res = await fetch(`${baseUrl}/api/users/${userId}/medications`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const meds = Array.isArray(data?.medications) ? data.medications : [];
+      setMedications(meds);
+    } catch {
+      setMedications([]);
+    }
+  };
+
   const refreshEvents = async () => {
     try {
       setLoading(true);
@@ -71,24 +95,40 @@ const WeekCalendar = () => {
 
   useEffect(() => {
     fetchEvents();
+    fetchMedications();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const colorPalette = useMemo(
-    () => ["bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500", "bg-pink-500", "bg-yellow-500"],
-    []
-  );
-
-  const hashString = (s: string) => {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = (h << 5) - h + s.charCodeAt(i);
-      h |= 0;
-    }
-    return Math.abs(h);
-  };
+  // Map medication names to their colors
+  const medColorMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    medications.forEach((med) => {
+      map[med.name] = med.color;
+    });
+    return map;
+  }, [medications]);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  // Convert color name to Tailwind class for schedule display
+  const colorToTailwind = (color: string) => {
+    switch (color) {
+      case "med-blue":
+        return "bg-blue-500";
+      case "med-green":
+        return "bg-green-500";
+      case "med-orange":
+        return "bg-orange-500";
+      case "med-purple":
+        return "bg-purple-500";
+      case "med-pink":
+        return "bg-pink-500";
+      case "med-yellow":
+        return "bg-yellow-500";
+      default:
+        return "bg-gray-400";
+    }
+  };
 
   return (
     <Card className="flex flex-col h-full">
@@ -102,7 +142,6 @@ const WeekCalendar = () => {
       </CardHeader>
 
       <CardContent className="flex-1 p-0 min-h-0 flex flex-col">
-        {/* Scrollable interior; header row sticky */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="min-w-[800px]">
             {/* Day headers */}
@@ -138,12 +177,14 @@ const WeekCalendar = () => {
                     })
                     .map((ev, idx) => {
                       const start = parseISO(ev.start?.date_time ?? "");
-                      const color = colorPalette[hashString(ev.title ?? "") % colorPalette.length];
+                      // Use medication color if available, else fallback
+                      const medColor = medColorMap[ev.title ?? ""] ?? "";
+                      const colorClass = colorToTailwind(medColor);
                       return {
                         id: ev.id ?? `${dayIndex}-${hour}-${idx}`,
                         name: ev.title ?? "Event",
                         time: format(start, "HH:mm"),
-                        color,
+                        color: colorClass,
                         frequency: "once",
                         startDate: format(start, "yyyy-MM-dd"),
                       };
