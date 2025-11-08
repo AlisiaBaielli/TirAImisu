@@ -13,6 +13,7 @@ from typing import Optional
 from datetime import datetime, timedelta, date
 from Backend.calendar.cal_tools import create_recurring_events
 from fastapi import status
+from Backend.notifications.service import get_notifications as build_notifications
 
 app = FastAPI(title="PillPal API", version="1.0.0")
 
@@ -166,6 +167,19 @@ def get_calendar_events(calendar_id: str) -> dict:
         except Exception:
             pass
         return {"events": []}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+
+@app.get("/api/notifications")
+def list_notifications() -> dict:
+    """
+    Return dynamic notifications:
+      - reminder (blue): doses starting within the next 30 minutes
+      - low_stock (red): medications projected to run out within 7 days
+    """
+    try:
+        return build_notifications()
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
