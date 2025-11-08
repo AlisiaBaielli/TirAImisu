@@ -4,8 +4,8 @@ import shutil
 from typing import List, Dict, Any
 
 # Define file paths
-MEDICATION_FILE = "personal_medication.json"
-USER_DATA_FILE = "personal_data.json"
+MEDICATION_FILE = "./Backend/data/personal_medication.json"
+USER_DATA_FILE = "./Backend/data/personal_data.json"
 
 
 def _read_json(filepath: str) -> List[Dict[str, Any]]:
@@ -35,6 +35,7 @@ def _write_to_json(filepath: str, data: List[Dict[str, Any]]) -> bool:
 
 def retrieve_medications(user_id: str) -> List[Dict[str, Any]]:
     all_med_data = _read_json(MEDICATION_FILE)
+    print("All med data: ", all_med_data)
 
     for user_data in all_med_data:
         if user_data.get("user_id") == user_id:
@@ -55,3 +56,6 @@ def add_new_medication(user_id: str, new_medication: Dict[str, Any]) -> bool:
             user_data["medications"].append(new_medication)
 
     return _write_to_json(MEDICATION_FILE, all_med_data)
+
+
+retrieve_medications("1")
