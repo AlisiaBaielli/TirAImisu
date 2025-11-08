@@ -7,6 +7,7 @@ import CurrentMedicationsList from "@/components/CurrentMedicationsList";
 import WeekCalendar from "@/components/WeekCalendar";
 import ScanMedicationButton from "@/components/ScanMedicationButton";
 import AIAssistantChat from "@/components/AIAssistantChat";
+import logo from "@/assets/logo.png";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,17 +31,22 @@ const Dashboard = () => {
 
   return (
     <div className="h-screen overflow-hidden bg-background flex flex-col">
+      {/* Header: left = logo + name + welcome, right = actions */}
       <header className="border-b bg-card/50 backdrop-blur-sm shrink-0">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-primary">PillPal</h1>
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          {/* Left group */}
+          <div className="flex items-center gap-3 min-w-0">
+            <img src={logo} alt="PillPal logo" className="h-14 w-14 rounded-lg shrink-0" />
+            <h1 className="text-2xl font-bold text-primary shrink-0">PillPal</h1>
             {username && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground truncate max-w-[40vw]">
                 Welcome, {username}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+
+          {/* Right group */}
+          <div className="flex items-center gap-3 shrink-0">
             <Button
               variant="outline"
               onClick={() => navigate("/my-data")}
@@ -56,21 +62,31 @@ const Dashboard = () => {
         </div>
       </header>
 
+      {/* Main content (no page scroll; internal scroll in calendar/chat) */}
       <div className="flex-1 container mx-auto px-4 py-6 overflow-hidden">
-        {/* 2-column layout; left uses 3 fixed rows (chat fixed height), right spans them */}
         <div className="grid lg:grid-cols-[1fr_2fr] gap-6 h-full">
-          <div className="grid grid-rows-[auto_auto_340px] gap-6 h-full min-h-0">
-            <NotificationWindow />
-            <CurrentMedicationsList />
-            <AIAssistantChat /> {/* fills 340px row; internal messages scroll */}
+          {/* LEFT: make chat fill remaining height */}
+          <div className="flex flex-col h-full min-h-0 gap-6">
+            <div className="shrink-0">
+              <NotificationWindow />
+            </div>
+            <div className="shrink-0">
+              <CurrentMedicationsList />
+            </div>
+            {/* Chat grows to fill, so its bottom aligns with calendar */}
+            <div className="flex-1 min-h-0">
+              <AIAssistantChat />
+            </div>
           </div>
+
+          {/* RIGHT: calendar fills full height and scrolls internally */}
           <div className="h-full min-h-0">
-            <WeekCalendar /> {/* spans same total height; bottom aligns with chat bottom */}
+            <WeekCalendar />
           </div>
         </div>
       </div>
 
-      {/* Floating scan button overlapping calendar */}
+      {/* Floating scan button */}
       <ScanMedicationButton />
     </div>
   );

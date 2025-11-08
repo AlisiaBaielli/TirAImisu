@@ -21,9 +21,11 @@ import uuid
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
-from logger import (
+from Backend.agents.logger import (
     logger,
 )  # expects your existing logger with .log_tool_result / .log_agent_response
+
+from extract_data_from_img import extract_medication_data_from_image
 
 
 # ──────────────────────────── Pipeline State ────────────────────────────
@@ -73,6 +75,8 @@ class CameraAgent:
         - Else if text present: parse into the same structure
         - Put results into state["extracted"]
         """
+
+        extract_medication_data_from_image()
         return _log(state, "ingest", {"note": "stub; no extraction performed"})
 
     def n_save(self, state: CameraState) -> CameraState:

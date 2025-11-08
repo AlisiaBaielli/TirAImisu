@@ -14,14 +14,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Camera } from "lucide-react";
 import { toast } from "sonner";
 
+export interface NewMedicationPayload {
+  name: string;
+  dosage: string;
+  numberOfPills: string;
+  startDate: string;
+  endDate: string;
+  frequency: string;
+  time: string;
+}
+
 interface ScanMedicationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: (data: NewMedicationPayload) => void; // CHANGED
 }
 
 const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationDialogProps) => {
-  const [manualEntry, setManualEntry] = useState({
+  const [manualEntry, setManualEntry] = useState<NewMedicationPayload>({
     name: "",
     dosage: "",
     numberOfPills: "",
@@ -31,9 +41,7 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
     time: "",
   });
 
-  const handleCameraClick = () => {
-    toast.info("Camera feature will be available in a future update");
-  };
+  const handleCameraClick = () => {};
 
   const handleConfirm = async () => {
     if (!manualEntry.name || !manualEntry.dosage) {
@@ -88,28 +96,19 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
       <DialogContent className="max-w-md animate-scale-in">
         <DialogHeader>
           <DialogTitle>Scan Medication</DialogTitle>
-          <DialogDescription>
-            Take a photo or enter medication details manually
-          </DialogDescription>
+          <DialogDescription>Take a photo or enter medication details manually</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Camera Section */}
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-32 w-32 rounded-full hover-scale"
-              onClick={handleCameraClick}
-            >
+            <Button variant="outline" size="lg" className="h-32 w-32 rounded-full" onClick={handleCameraClick}>
               <Camera className="h-12 w-12" />
             </Button>
           </div>
 
-          {/* Manual Entry Section */}
           <div className="space-y-4">
             <h3 className="font-semibold text-sm">Manual Entry</h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="name">Medication Name</Label>
               <Input
@@ -151,7 +150,6 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
                   onChange={(e) => setManualEntry({ ...manualEntry, startDate: e.target.value })}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="endDate">End Date (Optional)</Label>
                 <Input
@@ -194,9 +192,7 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
         </div>
 
         <DialogFooter>
-          <Button onClick={handleConfirm} className="w-full hover-scale">
-            Confirm
-          </Button>
+          <Button onClick={handleConfirm} className="w-full">Confirm</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
