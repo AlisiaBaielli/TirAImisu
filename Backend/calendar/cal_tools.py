@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from Backend.calendar.cal_api import create_event
+from Backend.medications.medication import Medication
 
 
 
@@ -52,21 +53,36 @@ def create_recurring_events(calendar_id, title, start_dt, end_dt, occurrences=5,
             print(f"Failed to create event {i+1}/{occurrences}")
 
 
-def create_recurring_event_medication(calendar_id, title, phase, start_dt, end_dt, occurrences, hour_interval, description=None, location=None):
+def create_recurring_event_medication(calendar_id, medication: Medication, phase: str | int, start_dt: datetime, end_dt: datetime, occurrences, location=None):
     """
     Create a recurring event for medication.
     Parameters:
     - calendar_id: ID of the calendar
-    - title: Medication title
-    - phase: Phase of the day (MORNING, AFTERNOON, EVENING)
+    - medication: Medication object (name, hour_interval, etc.)
+    - phase: Phase of the day (MORNING, AFTERNOON, EVENING) or hour
+    - occurrences: Number of medications to create
     - start_dt: datetime object for the first medication start
     - end_dt: datetime object for the first medication end
-    - occurrences: Number of medications to create
-    - hour_interval: Number of hours between each medication
+    - location: Optional event location
     """
-    assert phase in DAY_PHASES_MAPPING, "Invalid phase"
-    start_hm = DAY_PHASES_MAPPING[phase]["start"]
-    end_hm = DAY_PHASES_MAPPING[phase]["end"]
+    if isinstance(phase, int):
+        start_hm = (phase, 0)
+        end_hm = (phase, 10)
+    else:
+        assert phase in DAY_PHASES_MAPPING, "Invalid phase"
+        start_hm = DAY_PHASES_MAPPING[phase]["start"]
+        end_hm = DAY_PHASES_MAPPING[phase]["end"]
     start_dt = datetime(start_dt.year, start_dt.month, start_dt.day, start_hm[0], start_hm[1])
     end_dt = datetime(end_dt.year, end_dt.month, end_dt.day, end_hm[0], end_hm[1])
-    create_recurring_events(calendar_id, title, start_dt, end_dt, occurrences, hour_interval, description, location)
+
+    print(f"Creating recurring event for {medication.name} from {start_dt} to {end_dt} with {occurrences} occurrences, hour interval {medication.hour_interval}")
+    create_recurring_events(
+        calendar_id,
+        medication.name,
+        start_dt,
+        end_dt,
+        occurrences,
+        medication.hour_interval,
+        medication.description,
+        location,
+    )

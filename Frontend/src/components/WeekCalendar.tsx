@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 
@@ -25,27 +26,47 @@ const WeekCalendar = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-        const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
-        const res = await fetch(`${base}/api/calendar/${calendarId}/events`);
-        if (!res.ok) {
-          throw new Error(`Failed to load events (${res.status})`);
-        }
-        const data = await res.json();
-        setEvents(Array.isArray(data?.events) ? data.events : []);
-      } catch (e: any) {
-        setError(e?.message ?? "Failed to load events");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+  const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
 
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events`);
+      if (!res.ok) {
+        throw new Error(`Failed to load events (${res.status})`);
+      }
+      const data = await res.json();
+      setEvents(Array.isArray(data?.events) ? data.events : []);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events/refresh`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to refresh events (${res.status})`);
+      }
+      await fetchEvents();
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to refresh events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const colorPalette = useMemo(() => ["bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500"], []);
@@ -63,7 +84,14 @@ const WeekCalendar = () => {
   return (
     <Card className="h-[calc(100vh-180px)]">
       <CardHeader>
-        <CardTitle>7-Day Medication Schedule</CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>7-Day Medication Schedule</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={refreshEvents} disabled={loading}>
+              {loading ? "Refreshing..." : "Refresh"}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-auto h-[calc(100vh-260px)]">

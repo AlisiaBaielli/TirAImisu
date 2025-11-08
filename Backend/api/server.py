@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from Backend.storage.events import get_events, set_events
+from Backend.medications.repository import get_current_medications
 
 app = FastAPI(title="Prosus Calendar API", version="1.0.0")
 
@@ -74,6 +75,14 @@ def refresh_calendar_events(calendar_id: str) -> dict:
         raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
+@app.get("/api/medications")
+def list_medications() -> dict:
+    """
+    Return the current medications, serialized from the Medication class.
+    """
+    meds = [m.to_dict() for m in get_current_medications()]
+    return {"medications": meds}
 
 
 # Optional: allow `python -m Backend.api.server` to run the dev server directly
