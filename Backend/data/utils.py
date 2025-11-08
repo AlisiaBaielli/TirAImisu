@@ -3,10 +3,12 @@ import os
 import shutil
 from typing import List, Dict, Any
 
-# Define file paths
-MEDICATION_FILE = "./Backend/data/personal_medication.json"
-USER_DATA_FILE = "./Backend/data/personal_data.json"
+# Get the absolute path of the directory this script (utils.py) is in
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Define file paths
+MEDICATION_FILE = os.path.join(SCRIPT_DIR, 'personal_medication.json')
+USER_DATA_FILE = os.path.join(SCRIPT_DIR, 'personal_data.json')
 
 def _read_json(filepath: str) -> List[Dict[str, Any]]:
     if not os.path.exists(filepath):
@@ -56,6 +58,3 @@ def add_new_medication(user_id: str, new_medication: Dict[str, Any]) -> bool:
             user_data["medications"].append(new_medication)
 
     return _write_to_json(MEDICATION_FILE, all_med_data)
-
-
-retrieve_medications("1")
