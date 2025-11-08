@@ -3,9 +3,9 @@ import { Pill } from "lucide-react";
 
 const CurrentMedicationsList = () => {
   const medications = [
-    { id: 1, name: "Aspirin 100mg", time: "8:00 AM", color: "med-blue" },
-    { id: 2, name: "Vitamin D 2000IU", time: "12:00 PM", color: "med-green" },
-    { id: 3, name: "Metformin 500mg", time: "6:00 PM", color: "med-orange" },
+    { id: 1, name: "Aspirin 100mg", time: "8:00 AM", frequency: "Daily", color: "med-blue" },
+    { id: 2, name: "Vitamin D 2000IU", time: "12:00 PM", frequency: "Weekly", color: "med-green" },
+    { id: 3, name: "Metformin 500mg", time: "6:00 PM", frequency: "Daily", color: "med-orange" },
   ];
 
   return (
@@ -30,7 +30,10 @@ const CurrentMedicationsList = () => {
                   <p className="text-sm font-medium truncate" style={{ color: `hsl(var(--${med.color}))` }}>
                     {med.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{med.time}</p>
+                  <p className="text-xs text-muted-foreground">
+                    <span><strong>Time:</strong> {med.time}</span> |{" "}
+                    <span><strong>Frequency:</strong> {med.frequency}</span>
+                  </p>
                 </div>
               </div>
             ))}
