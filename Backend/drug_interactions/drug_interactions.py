@@ -14,18 +14,16 @@ class InteractionReport(BaseModel):
     extended_description: Optional[str] = Field(None, description="A detailed explanation of the interaction's mechanism, effects, and management if found.")
 
 load_dotenv() 
-
+# Initialize OpenAI client lazily and safely (do not exit the host process)
+client: Optional[openai.OpenAI] = None
 try:
-    # Check if the key was loaded successfully
-    if not os.environ.get("OPENAI_API_KEY"):
-        raise openai.OpenAIError("OPENAI_API_KEY not found. Make sure it's set in your .env file.")
-    
-    # The client will now automatically find the key
-    client = openai.OpenAI()
-    
-except openai.OpenAIError as e:
+    if os.environ.get("OPENAI_API_KEY"):
+        client = openai.OpenAI()
+    else:
+        print("Warning: OPENAI_API_KEY not found. LLM interaction checks will be skipped.")
+except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
-    exit()
+    client = None
 
 def get_interaction_text(drug_name: str) -> str | None:
     """
@@ -99,6 +97,9 @@ def check_interaction_with_llm(interaction_text: str, drug_a_name: str, drug_b_n
     Asks an LLM to analyze the interaction text and return a structured report.
     """
     print(f"🧠 Analyzing {drug_a_name}'s label for '{drug_b_name}'...")
+    if client is None:
+        print("LLM client not initialized; skipping interaction analysis.")
+        return None
 
     system_prompt = (
         "You are an expert pharmacologist. You will be given text from a drug label and the name of a second drug. "
@@ -190,6 +191,9 @@ def synthesize_reports(reports: List[InteractionReport], drug_a: str, drug_b: st
         }
     ]
     try:
+        if client is None:
+            print("LLM client not initialized; skipping synthesis.")
+            return None
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[

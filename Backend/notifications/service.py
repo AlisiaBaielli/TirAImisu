@@ -10,9 +10,18 @@ from Backend.notifications.models import Notification, NotificationCategory
 from Backend.medications.repository import get_medication_events
 from Backend.storage.events import get_events as get_cached_events, set_events as set_cached_events
 from datetime import timezone
+from typing import Optional, Tuple
+import openai
+import hashlib
 
 # Logger
 logger = logging.getLogger("notifications")
+if not logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s notifications: %(message)s"))
+    logger.addHandler(_h)
+logger.setLevel(logging.INFO)
+logger.propagate = False
 
 
 def _now() -> datetime:
@@ -266,28 +275,317 @@ def _build_event_soon_notifications(now: datetime) -> List[Notification]:
         if not (now <= start_dt <= window_event_end):
             continue
         title = (ev.get("title") or ev.get("summary") or "Event")
+        description = (
+            ev.get("description")
+            or ev.get("details")
+            or ev.get("notes")
+            or ev.get("body")
+            or ""
+        )
+
+        # Identify meds taken within the last 12 hours before the event start
+        recent_meds = _get_recent_meds_before_event(start_dt, hours=12)
+        med_names = sorted({m for m in recent_meds})
+
         mins_left = max(0, int((start_dt - now).total_seconds() // 60))
         hours = mins_left // 60
         minutes = mins_left % 60
         when_text = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
         nid = f"eventsoon:{ev.get('id') or title}:{int(start_dt.timestamp())}"
+        meds_text = (", ".join(med_names)) if med_names else "no recent meds"
+        base_msg = f"You have '{title}' today in {when_text}. Recent meds (≤12h): {meds_text}."
+
+        # Personalized LLM advice with caching (best-effort; optional)
+        advice_key = _make_advice_cache_key(
+            event_id=str(ev.get("id") or title),
+            event_start=start_dt,
+            event_title=title,
+            event_description=description,
+            medications=med_names,
+        )
+        advice = _advice_cache_get(advice_key)
+        if advice:
+            logger.info("LLM advice: using cached advice for key=%s", advice_key[:12])
+        else:
+            advice = _llm_personalized_event_advice(
+                event_title=title,
+                event_description=description,
+                event_start=start_dt,
+                medications=med_names,
+            )
+            if advice:
+                _advice_cache_set(advice_key, advice)
+                logger.info("LLM advice: cached new advice for key=%s", advice_key[:12])
+
+        # Interactions temporarily disabled
+        final_msg = base_msg
+        if advice:
+            final_msg = f"{final_msg} Advice: {advice}"
+        final_msg = final_msg.strip()
         results.append(
             Notification(
                 id=nid,
                 category=NotificationCategory.EVENT_SOON,
                 title="Event soon after your dose",
-                message=f"You have '{title}' today in {when_text}.",
+                message=final_msg,
                 due_at=start_dt,
                 color="brown",
                 metadata={
                     "eventTitle": title,
                     "eventStartAt": start_dt.isoformat(),
+                    "recentMeds": med_names,
+                    "interactions": [],
+                    "interactionsSkipped": True,
+                    "eventDescription": description[:1000] if description else "",
+                    "advice": advice,
+                    "adviceKey": advice_key,
                 },
             )
         )
     logger.info("Built %d event-soon notifications", len(results))
     return results
 
+
+def _get_recent_meds_before_event(event_start: datetime, hours: int = 12) -> List[str]:
+    """
+    Return names of medications that have scheduled start times within (event_start - hours, event_start].
+    """
+    try:
+        meds_events = get_medication_events()
+    except Exception:
+        logger.exception("Failed to load medication events for recent-meds computation")
+        return []
+    window_start = event_start - timedelta(hours=max(1, hours))
+    names: List[str] = []
+    for ev in meds_events:
+        try:
+            title = (ev.get("title") or "").strip()
+            if not title:
+                continue
+            start_dt = _to_local_naive(_parse_iso((ev.get("start") or {}).get("date_time")))
+            if not start_dt:
+                continue
+            if window_start < start_dt <= event_start:
+                names.append(title)
+        except Exception:
+            continue
+    return names
+
+
+def _check_interactions_for_meds(med_names: List[str]) -> Tuple[str, List[Dict[str, Any]]]:
+    """
+    Best-effort check for interactions among a set of medication names by calling
+    the drug_interactions helper. We call it for each med as 'new_drug' against the others.
+    Returns a short summary and a detailed list (for metadata).
+    """
+    detail: List[Dict[str, Any]] = []
+    if not med_names or len(med_names) < 2:
+        return ("", detail)
+    try:
+        # Lazy import to avoid import-time failures
+        from Backend.drug_interactions.drug_interactions import check_new_medication_against_list, InteractionReport  # type: ignore
+    except Exception as exc:
+        logger.info("Drug interactions module unavailable: %s", exc)
+        return ("", detail)
+
+    interactions_found = 0
+    seen_pairs = set()
+    for i, new_drug in enumerate(med_names):
+        existing = [m for j, m in enumerate(med_names) if j != i]
+        try:
+            reports = check_new_medication_against_list(existing, new_drug) or []
+        except Exception as exc:
+            logger.info("Interaction check failed for %s vs list: %s", new_drug, exc)
+            continue
+        for new_name, existing_name, report in reports:
+            pair_key = tuple(sorted([new_name, existing_name]))
+            if pair_key in seen_pairs:
+                continue
+            seen_pairs.add(pair_key)
+            interactions_found += 1
+            try:
+                # Pydantic model from module; safely convert
+                if hasattr(report, "model_dump"):
+                    rep = report.model_dump()
+                else:
+                    rep = {
+                        "interaction_found": getattr(report, "interaction_found", True),
+                        "severity": getattr(report, "severity", None),
+                        "description": getattr(report, "description", None),
+                        "extended_description": getattr(report, "extended_description", None),
+                    }
+            except Exception:
+                rep = {"raw": str(report)}
+            detail.append({
+                "drugA": new_name,
+                "drugB": existing_name,
+                "report": rep,
+            })
+
+    if interactions_found == 0:
+        return ("No interactions found among recent meds.", detail)
+    if interactions_found == 1:
+        return ("Potential interaction found among recent meds.", detail)
+    return (f"{interactions_found} potential interactions found among recent meds.", detail)
+
+
+def _build_llm_client() -> Optional[openai.OpenAI]:
+    """
+    Create an OpenAI client similar to camera_agent usage:
+      - Requires OPENAI_API_KEY
+      - Uses OPENAI_BASE_URL if provided (proxy), else defaults
+    """
+    try:
+        key = os.getenv("OPENAI_API_KEY")
+        if not key:
+            logger.info("Skipping LLM advice: OPENAI_API_KEY not set")
+            return None
+        base_url = os.getenv("OPENAI_BASE_URL")
+        client = openai.OpenAI(api_key=key, base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")# if base_url else openai.OpenAI(api_key=key)
+        logger.info("LLM advice: client initialized (base_url=%s)", base_url or "default")
+        return client
+    except Exception as exc:
+        logger.info("Skipping LLM advice: failed to init client: %s", exc)
+        return None
+
+
+def _llm_personalized_event_advice(
+    event_title: str,
+    event_description: str,
+    event_start: datetime,
+    medications: List[str],
+) -> str:
+    """
+    Ask an LLM for concise, practical advice given the event context and recent medications.
+    Returns an empty string on failure or if LLM is not configured.
+    """
+    try:
+        logger.info(
+            "LLM advice: attempting for event='%s' start=%s meds=%s",
+            event_title,
+            event_start.isoformat(),
+            ", ".join(medications) if medications else "none",
+        )
+        # client = _build_llm_client()
+        client = openai.OpenAI(api_key='sk-r0hwmHPWW8yghQ0_axmBfw', base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
+        if client is None:
+            logger.info("LLM advice: client not available (missing key or init failed)")
+            return ""
+
+        desc = (event_description or "").strip()
+        if len(desc) > 600:
+            desc = desc[:600] + "…"
+        meds_list = ", ".join(medications) if medications else "None"
+        start_iso = event_start.isoformat()
+
+        system_prompt = (
+            "You are a concise clinical assistant. Given an upcoming event and medications taken within the last 12 hours, "
+            "provide a single short sentence (<=180 characters) of personalized advice about likely effects on wellbeing, "
+            "specific cautions, and what to avoid (e.g., alcohol, driving). Do not include disclaimers."
+        )
+        user_prompt = (
+            f"Event:\n"
+            f"- Title: {event_title}\n"
+            f"- Starts at: {start_iso}\n"
+            f"- Description: {desc or 'n/a'}\n\n"
+            f"Medications taken within 12h:\n"
+            f"- {meds_list}\n\n"
+            "Return only the advice sentence. Say if there is no interaction"
+        )
+
+        # model = os.getenv("OPENAI_MODEL", "gpt-5-nano")
+        model = "gpt-5"
+        logger.info("LLM advice: calling model=%s base_url=%s", model, "https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
+        # Prefer plain string messages for maximum compatibility
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ]
+        resp = client.chat.completions.create(model=model, messages=messages, max_tokens=180)
+        content = (getattr(resp.choices[0].message, "content", "") or "").strip()
+        # Fallback: some gateways return content chunks as list
+        if not content:
+            try:
+                parts = resp.choices[0].message.content
+                if isinstance(parts, list):
+                    texts = [p.get("text", "") for p in parts if isinstance(p, dict) and p.get("type") == "text"]
+                    content = " ".join([t for t in texts if t]).strip()
+            except Exception:
+                pass
+        if not content:
+            content = "No specific concerns based on provided meds and event."
+        logger.info("LLM advice: received content='%s'", content[:120].replace("\n", " "))
+        if len(content) > 200:
+            content = content[:200].rstrip() + "…"
+        return content
+    except Exception as exc:
+        logger.info("LLM advice generation failed: %s", exc)
+        return ""
+
+
+# --------------- Advice cache (file-based) ---------------
+_ADVICE_CACHE_PATH = os.getenv(
+    "ADVICE_CACHE_PATH",
+    os.path.join(os.path.dirname(__file__), "..", "storage", "notifications_advice_cache.json"),
+)
+
+
+def _load_advice_cache() -> Dict[str, str]:
+    try:
+        path = os.path.abspath(_ADVICE_CACHE_PATH)
+        if not os.path.exists(path):
+            return {}
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_advice_cache(cache: Dict[str, str]) -> None:
+    try:
+        path = os.path.abspath(_ADVICE_CACHE_PATH)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        tmp_path = path + ".tmp"
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(cache, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, path)
+    except Exception as exc:
+        logger.info("Advice cache save failed: %s", exc)
+
+
+def _advice_cache_get(key: str) -> Optional[str]:
+    cache = _load_advice_cache()
+    return cache.get(key)
+
+
+def _advice_cache_set(key: str, value: str) -> None:
+    cache = _load_advice_cache()
+    cache[key] = value
+    _save_advice_cache(cache)
+
+
+def _make_advice_cache_key(
+    event_id: str,
+    event_start: datetime,
+    event_title: str,
+    event_description: str,
+    medications: List[str],
+) -> str:
+    payload = {
+        "eventId": event_id,
+        "start": int(event_start.timestamp()),
+        "title": event_title,
+        # limit description length to avoid massive keys
+        "desc": (event_description or "")[:256],
+        "meds": sorted(medications or []),
+        # include model in key to avoid cross-model reuse
+        "model": os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL") or "gpt-5",
+        "base_url": os.getenv("OPENAI_BASE_URL") or "default",
+    }
+    raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
+    digest = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+    return f"adv:{digest}"
 
 def get_notifications() -> Dict[str, List[Dict[str, Any]]]:
     """
