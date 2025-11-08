@@ -10,7 +10,7 @@ from langchain_core.tools import tool
 
 # from Backend.calendar.cal_api import list_events
 from Backend.data.utils import retrieve_medications
-from Backend.drug_interactions.drug_interactions import get_interaction_text
+from Backend.drug_interactions.drug_interactions import get_drug_side_effects
 
 # from db import db_get_user_meds, db_check_pair_interaction
 from Backend.agents.logger import logger  # ✅ import your custom logger
@@ -49,7 +49,7 @@ def check_side_effects(drug: str) -> Dict[str, Any]:
     """
     logger.log_tool_call("check_side_effects", {"drug": drug})
 
-    result = get_interaction_text(drug)
+    result = get_drug_side_effects(drug)
 
     logger.log_tool_result("check_side_effects", result)
     return result

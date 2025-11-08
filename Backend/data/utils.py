@@ -7,8 +7,9 @@ from typing import List, Dict, Any
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Define file paths
-MEDICATION_FILE = os.path.join(SCRIPT_DIR, 'personal_medication.json')
-USER_DATA_FILE = os.path.join(SCRIPT_DIR, 'personal_data.json')
+MEDICATION_FILE = os.path.join(SCRIPT_DIR, "personal_medication.json")
+USER_DATA_FILE = os.path.join(SCRIPT_DIR, "personal_data.json")
+
 
 def _read_json(filepath: str) -> List[Dict[str, Any]]:
     if not os.path.exists(filepath):
