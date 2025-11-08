@@ -50,7 +50,6 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
     }
     try {
       const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-      const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
       const name = `${manualEntry.name.trim()} ${manualEntry.dosage.trim()}`.trim();
       const hour = (() => {
         const [h] = manualEntry.time.split(":");
@@ -83,9 +82,9 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
 
       // Best-effort refresh of calendar events cache
       try {
-        await fetch(`${base}/api/calendar/${calendarId}/events/refresh`, { method: "POST" });
+        await fetch(`${base}/api/events-calendar/events/refresh`, { method: "POST" });
       } catch {}
-      onConfirm();
+      onConfirm(manualEntry);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to add medication");
     }
