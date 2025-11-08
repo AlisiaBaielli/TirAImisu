@@ -8,7 +8,7 @@ USER = {
     "first_name": "Jan",
     "last_name": "Jansen",
     "email": "jan.jansen@example.com",
-    "phone": "+31 6 12345678",
+    "phone": "0612345678",
     "street": "Keizersgracht 1",
     "postal_code": "1015CS",
     "city": "Amsterdam",
