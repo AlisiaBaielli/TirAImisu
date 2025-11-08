@@ -43,16 +43,29 @@ def get_current_meds(user_id: str) -> List[Dict[str, Any]]:
 
 
 @tool
-def check_interaction(drug: str) -> Dict[str, Any]:
+def check_side_effects(drug: str) -> Dict[str, Any]:
     """
     get the interaction information for a given drug from database
     """
-    logger.log_tool_call("check_interaction", {"drug": drug})
+    logger.log_tool_call("check_side_effects", {"drug": drug})
 
     result = get_interaction_text(drug)
 
-    logger.log_tool_result("check_interaction", result)
+    logger.log_tool_result("check_side_effects", result)
     return result
+
+
+# @tool
+# def check_interaction(drug1: str) -> Dict[str, Any]:
+#     """
+#     get the interaction information for a given drug from database
+#     """
+#     logger.log_tool_call("check_side_effects", {"drug": drug})
+
+#     result = get_interaction_text(drug)
+
+#     logger.log_tool_result("check_side_effects", result)
+#     return result
 
 
 # @tool  # ALREADY EXISTS
@@ -65,4 +78,4 @@ def check_interaction(drug: str) -> Dict[str, Any]:
 
 
 # Export list for create_react_agent()
-TOOLS = [get_user_id, get_current_meds, check_interaction]
+TOOLS = [get_user_id, get_current_meds, check_side_effects]

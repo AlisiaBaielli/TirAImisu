@@ -26,6 +26,7 @@ from Backend.agents.logger import (
 )  # expects your existing logger with .log_tool_result / .log_agent_response
 
 from extract_data_from_img import extract_medication_data_from_image
+from Backend.data.utils import retrieve_medications, add_new_medication
 
 
 # ──────────────────────────── Pipeline State ────────────────────────────
@@ -66,6 +67,7 @@ class CameraAgent:
     def __init__(self):
         self.memory = MemorySaver()
         self._setup_graph()
+        self.something = None  # returned function
 
     # ───────────── Nodes (EMPTY implementations; add logic later) ───────────── #
     def n_ingest(self, state: CameraState) -> CameraState:
@@ -75,8 +77,8 @@ class CameraAgent:
         - Else if text present: parse into the same structure
         - Put results into state["extracted"]
         """
-
-        extract_medication_data_from_image()
+        # TODO: What do we return
+        self.something = extract_medication_data_from_image()
         return _log(state, "ingest", {"note": "stub; no extraction performed"})
 
     def n_save(self, state: CameraState) -> CameraState:
@@ -85,6 +87,7 @@ class CameraAgent:
         - Persist medication + stock to your DB
         - Return identifiers/flags in state["saved"]
         """
+        add_new_medication(self.something)
         return _log(state, "save", {"note": "stub; nothing saved"})
 
     def n_interactions(self, state: CameraState) -> CameraState:

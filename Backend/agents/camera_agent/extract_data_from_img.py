@@ -102,12 +102,8 @@ def _clean_model_response_to_json(text: str) -> Dict[str, Any]:
         return json.loads(cleaned)
 
 
-def extract_medication_data_from_image(
-    image: Union[bytes, str],
-    model: str = "gpt-5",
-    openai_api_base: Optional[str] = None,
-) -> Dict[str, Any]:
-    """Extract medication_name, dosage, and num_pills from an image using a multimodal model.
+def extract_medication_data_from_image(image: Union[bytes, str]) -> Dict[str, Any]:
+	"""Extract medication_name, dosage, and num_pills from an image using a multimodal model.
 
     Parameters
     - image: bytes or a file path (str) to the image captured from webcam
@@ -118,19 +114,18 @@ def extract_medication_data_from_image(
     Returns a dict: {"medication_name": str|None, "dosage": str|None, "num_pills": int|None}
     """
 
-    key = os.getenv("OPENAI_API_KEY")
-    if not key:
-        raise RuntimeError("No API key provided. Set OPENAI_API_KEY env var.")
+	key = os.getenv("OPENAI_API_KEY")
+	if not key:
+		raise RuntimeError("No API key provided and no client passed. Set OPENAI_API_KEY env var.")
 
-    client = openai.OpenAI(
-        api_key=key,
-        base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1",
-    )
-    if isinstance(image, str):
-        with open(image, "rb") as f:
-            image_bytes = f.read()
-    else:
-        image_bytes = image
+	model = "gpt-5"
+	client = openai.OpenAI(api_key=key, base_url=os.getenv("OPENAI_BASE_URL"))
+
+	if isinstance(image, str):
+		with open(image, "rb") as f:
+			image_bytes = f.read()
+	else:
+		image_bytes = image
 
     # Build prompt: instruct the model to analyze the attached image. Do NOT rely on
     # any base64 prefix embedded in the prompt — the image will be supplied separately
@@ -194,78 +189,72 @@ def extract_medication_data_from_image(
     return med.dict()
 
 
-def capture_image_from_webcam(
-    device: int = 0, width: int = 1280, height: int = 720, timeout: int = 15
-) -> bytes:
-    """Open the webcam and capture a single image, returning JPEG bytes.
+# def capture_image_from_webcam(device: int = 0, width: int = 1280, height: int = 720, timeout: int = 60) -> bytes:
+# 	"""Open the webcam and capture a single image, returning JPEG bytes.
 
-    Controls:
-    - Press SPACE or 's' to capture the current frame.
-    - Press 'q' or ESC to cancel and raise RuntimeError.
+# 	Controls:
+# 	- Press SPACE or 's' to capture the current frame.
+# 	- Press 'q' or ESC to cancel and raise RuntimeError.
 
-    Parameters:
-    - device: camera device index (default 0).
-    - width, height: requested capture resolution.
-    - timeout: maximum seconds to wait for a capture before raising TimeoutError.
+# 	Parameters:
+# 	- device: camera device index (default 0).
+# 	- width, height: requested capture resolution.
+# 	- timeout: maximum seconds to wait for a capture before raising TimeoutError.
 
-    Returns:
-    - JPEG bytes suitable for passing to extract_medication_data_from_image.
-    """
+# 	Returns:
+# 	- JPEG bytes suitable for passing to extract_medication_data_from_image.
+# 	"""
 
-    if not _HAS_OPENCV:
-        raise RuntimeError(
-            "OpenCV (opencv-python) is required for webcam capture. Install with: pip install opencv-python"
-        )
+# 	if not _HAS_OPENCV:
+# 		raise RuntimeError("OpenCV (opencv-python) is required for webcam capture. Install with: pip install opencv-python")
 
-    cap = cv2.VideoCapture(device, cv2.CAP_DSHOW if os.name == "nt" else 0)
-    if not cap.isOpened():
-        raise RuntimeError(f"Could not open webcam device {device}")
+# 	cap = cv2.VideoCapture(device, cv2.CAP_DSHOW if os.name == 'nt' else 0)
+# 	if not cap.isOpened():
+# 		raise RuntimeError(f"Could not open webcam device {device}")
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+# 	cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+# 	cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
-    window_name = "Capture - press SPACE to take photo, Q to quit"
-    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-    start = time.time()
-    captured_bytes = None
+# 	window_name = "Capture - press SPACE to take photo, Q to quit"
+# 	cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+# 	start = time.time()
+# 	captured_bytes = None
 
-    try:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                time.sleep(0.1)
-                if time.time() - start > timeout:
-                    raise TimeoutError("Timed out waiting for webcam frames")
-                continue
+# 	try:
+# 		while True:
+# 			ret, frame = cap.read()
+# 			if not ret:
+# 				time.sleep(0.1)
+# 				if time.time() - start > timeout:
+# 					raise TimeoutError("Timed out waiting for webcam frames")
+# 				continue
 
-            cv2.imshow(window_name, frame)
+# 			cv2.imshow(window_name, frame)
 
-            key = cv2.waitKey(1) & 0xFF
-            # SPACE or 's' to capture
-            if key == 32 or key == ord("s"):
-                success, encoded = cv2.imencode(
-                    ".jpg", frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90]
-                )
-                if not success:
-                    raise RuntimeError("Failed to encode captured frame to JPEG")
-                captured_bytes = encoded.tobytes()
-                break
-            if key == ord("q") or key == 27:
-                raise RuntimeError("User cancelled webcam capture")
+# 			key = cv2.waitKey(1) & 0xFF
+# 			# SPACE or 's' to capture
+# 			if key == 32 or key == ord('s'):
+# 				success, encoded = cv2.imencode('.jpg', frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
+# 				if not success:
+# 					raise RuntimeError("Failed to encode captured frame to JPEG")
+# 				captured_bytes = encoded.tobytes()
+# 				break
+# 			if key == ord('q') or key == 27:
+# 				raise RuntimeError("User cancelled webcam capture")
 
-            if time.time() - start > timeout:
-                raise TimeoutError("Timed out waiting for user to capture image")
-    finally:
-        try:
-            cap.release()
-        except Exception:
-            pass
-        try:
-            cv2.destroyWindow(window_name)
-        except Exception:
-            pass
+# 			if time.time() - start > timeout:
+# 				raise TimeoutError("Timed out waiting for user to capture image")
+# 	finally:
+# 		try:
+# 			cap.release()
+# 		except Exception:
+# 			pass
+# 		try:
+# 			cv2.destroyWindow(window_name)
+# 		except Exception:
+# 			pass
 
-    if captured_bytes is None:
-        raise RuntimeError("No image captured from webcam")
+# 	if captured_bytes is None:
+# 		raise RuntimeError("No image captured from webcam")
 
-    return captured_bytes
+# 	return captured_bytes
