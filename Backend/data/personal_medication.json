@@ -45,20 +45,6 @@
         "color": "med-orange"
       },
       {
-        "drug_name": "Zyrtec 10 mg",
-        "strength": "",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "09:00"
-          ]
-        },
-        "start_date": "2025-11-08",
-        "color": "med-purple"
-      },
-      {
         "drug_name": "TestMed",
         "strength": "10mg",
         "quantity_left": 5,
@@ -70,7 +56,7 @@
           ]
         },
         "start_date": "2025-11-08",
-        "color": "med-pink"
+        "color": "med-purple"
       }
     ]
   },
