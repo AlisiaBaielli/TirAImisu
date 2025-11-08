@@ -1,0 +1,8 @@
+id,name,time,color,hour_interval,description
+1,Aspirin 100mg,8,med-blue,24,Take with water after breakfast
+2,Vitamin D 2000IU,12,med-green,24,Daily supplement at noon
+3,Metformin 500mg,18,med-orange,24,With evening meal
+
+4,AAAAA aaa,16,med-blue,24,Added via scan
+5,Test med 100mg,11,med-blue,24,Added via scan
+6,test2 100mg,19,med-blue,24,Added via scan
