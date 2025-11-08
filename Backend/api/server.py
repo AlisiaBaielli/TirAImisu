@@ -12,7 +12,11 @@ import logging
 
 from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
-from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
+from Backend.medications.repository import (
+    get_current_medications,
+    add_medication,
+    get_medication_events,
+)
 from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
@@ -20,7 +24,10 @@ from Backend.data.utils import add_new_medication, retrieve_medications, ensure_
 from Backend.agents.camera_agent.email_doctor import send_email_to_doctor
 
 # import drug interactions tools
-from Backend.drug_interactions.drug_interactions import check_new_medication_against_list, get_drug_side_effects
+from Backend.drug_interactions.drug_interactions import (
+    check_new_medication_against_list,
+    get_drug_side_effects,
+)
 
 app = FastAPI(title="PillPal API", version="1.0.0")
 logger = logging.getLogger("api")
@@ -89,7 +96,12 @@ class LoginRequest(BaseModel):
 def login(payload: LoginRequest):
     users = _load_json("personal_data.json")
     user = next(
-        (u for u in users if u.get("username") == payload.username and u.get("password") == payload.password),
+        (
+            u
+            for u in users
+            if u.get("username") == payload.username
+            and u.get("password") == payload.password
+        ),
         None,
     )
     if not user:
@@ -121,7 +133,7 @@ def get_user_medications(user_id: str):
 
     meds: List[Dict[str, Any]] = []
     for i, m in enumerate(meds_raw):
-        name = f"{m.get('drug_name', 'Medication')}{f' {m.get('strength')}' if m.get('strength') else ''}".strip()
+        name = f"{m.get('drug_name', 'Medication')}{' ' + m.get('strength') if m.get('strength') else ''}".strip()
         freq = _format_frequency(m.get("schedule") or {})
         color = m.get("color") or "med-blue"
         meds.append(
@@ -176,8 +188,16 @@ def add_user_medication(user_id: str, payload: Dict[str, Any]):
     med = {
         "drug_name": str(drug_name).strip() if drug_name else None,
         "strength": str(strength).strip() if strength else "",
-        "quantity_left": int(qty) if isinstance(qty, (int, float, str)) and str(qty).strip() != "" else 0,
-        "dose_per_intake": int(payload.get("dose_per_intake", 1)) if payload.get("dose_per_intake") else 1,
+        "quantity_left": (
+            int(qty)
+            if isinstance(qty, (int, float, str)) and str(qty).strip() != ""
+            else 0
+        ),
+        "dose_per_intake": (
+            int(payload.get("dose_per_intake", 1))
+            if payload.get("dose_per_intake")
+            else 1
+        ),
         "schedule": schedule or {},
         "start_date": start_date,
         "end_date": end_date,
@@ -236,7 +256,9 @@ def create_medication(payload: MedicationCreate) -> dict:
         calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
         if calendar_id:
             if payload.start_date:
-                start_date_obj = datetime.strptime(payload.start_date, "%Y-%m-%d").date()
+                start_date_obj = datetime.strptime(
+                    payload.start_date, "%Y-%m-%d"
+                ).date()
             else:
                 start_date_obj = date.today()
             start_dt = datetime(
@@ -250,7 +272,9 @@ def create_medication(payload: MedicationCreate) -> dict:
             occ = payload.occurrences
             if not occ and payload.end_date:
                 try:
-                    end_date_obj = datetime.strptime(payload.end_date, "%Y-%m-%d").date()
+                    end_date_obj = datetime.strptime(
+                        payload.end_date, "%Y-%m-%d"
+                    ).date()
                     total_hours = (
                         datetime.combine(end_date_obj, datetime.min.time())
                         - datetime.combine(start_date_obj, datetime.min.time())
@@ -285,13 +309,17 @@ def list_medication_events() -> dict:
 def get_events_calendar_events() -> dict:
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="EVENTS_CALENDAR_ID env var not set",
+        )
     try:
         events = get_events(calendar_id)
         if events:
             return {"events": events}
         try:
             from Backend.calendar.cal_api import list_events as live_list_events
+
             live = live_list_events(calendar_id)
             if isinstance(live, list):
                 set_events(calendar_id, live)
@@ -307,12 +335,18 @@ def get_events_calendar_events() -> dict:
 def refresh_events_calendar_events() -> dict:
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="EVENTS_CALENDAR_ID env var not set",
+        )
     try:
         from Backend.calendar.cal_api import list_events as live_list_events
+
         live = live_list_events(calendar_id)
         if not isinstance(live, list):
-            raise HTTPException(status_code=502, detail="Invalid events format from upstream")
+            raise HTTPException(
+                status_code=502, detail="Invalid events format from upstream"
+            )
         set_events(calendar_id, live)
         return {"events": live}
     except HTTPException:
@@ -321,7 +355,7 @@ def refresh_events_calendar_events() -> dict:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@app.get("/buy")
+@app.post("/api/buy")
 async def buy(data: dict):
     drug_name = data.get("drug_name")
     if not drug_name:
@@ -357,10 +391,14 @@ def camera_agent_scan(payload: CameraScanRequest):
                 "image_b64": payload.image_b64,
                 "activity": [],
             },
-            config={"configurable": {"thread_id": f"scan-{payload.user_id}-{uuid.uuid4()}"}},
+            config={
+                "configurable": {"thread_id": f"scan-{payload.user_id}-{uuid.uuid4()}"}
+            },
         )
     except Exception:
-        result = camera_agent.run(json.dumps({"user_id": payload.user_id, "image_b64": payload.image_b64}))
+        result = camera_agent.run(
+            json.dumps({"user_id": payload.user_id, "image_b64": payload.image_b64})
+        )
 
     extracted = result.get("extracted") or {}
     med_name = extracted.get("medication_name")
@@ -381,7 +419,9 @@ def camera_agent_scan(payload: CameraScanRequest):
             add_new_medication(payload.user_id, new_med)
             meds = retrieve_medications(payload.user_id)
             for m in reversed(meds):
-                if m.get("drug_name") == med_name and (m.get("strength") or "") == (dosage or ""):
+                if m.get("drug_name") == med_name and (m.get("strength") or "") == (
+                    dosage or ""
+                ):
                     color_assigned = m.get("color")
                     break
         except Exception:
@@ -394,6 +434,38 @@ def camera_agent_scan(payload: CameraScanRequest):
         color=color_assigned,
     )
 
+
+# Drug interactions endpoint unchanged (calls check_new_medication_against_list)
+class DrugInteractionRequest(BaseModel):
+    user_id: str
+    new_medication_name: str
+
+
+@app.post("/api/drug-interactions")
+def drug_interactions_check(payload: DrugInteractionRequest):
+    user_id = payload.user_id
+    new_med = payload.new_medication_name
+    if not user_id or not new_med:
+        raise HTTPException(
+            status_code=400, detail="user_id and new_medication_name required"
+        )
+
+    existing = retrieve_medications(user_id)
+    existing_names: List[str] = []
+    for m in existing:
+        name = (m.get("drug_name") or "").strip()
+        strength = (m.get("strength") or "").strip()
+        if name:
+            existing_names.append(f"{name} {strength}".strip())
+
+    try:
+        results = check_new_medication_against_list(existing_names, new_med)
+    except Exception as exc:
+        logger.exception("Failed to send email to doctor")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {str(exc)}"
+        )
 
 # ─────────── Send email to doctor endpoint ─────────── #
 class SendEmailRequest(BaseModel):
@@ -430,14 +502,8 @@ def send_email_endpoint(payload: SendEmailRequest):
         )
     except HTTPException:
         raise
-    except Exception as exc:
-        logger.exception("Failed to send email to doctor")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(exc)}"
-        )
-
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("Backend.api.server:app", host="0.0.0.0", port=8000, reload=True)
