@@ -1,0 +1,68 @@
+[
+  {
+    "user_id": "1",
+    "medications": [
+      {
+        "drug_name": "Atorvastatin",
+        "strength": "20 mg",
+        "quantity_left": 18,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": ["08:00"]
+        },
+        "start_date": "2024-12-01"
+      },
+      {
+        "drug_name": "Ibuprofen",
+        "strength": "200 mg",
+        "quantity_left": 8,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "as_needed",
+          "max_per_day": 3
+        },
+        "start_date": "2025-01-12"
+      },
+      {
+        "drug_name": "Vitamin D3",
+        "strength": "50000 IU",
+        "quantity_left": 4,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "weekly",
+          "day": "Sunday",
+          "time": "20:00"
+        },
+        "start_date": "2025-01-01"
+      }
+    ]
+  },
+  {
+    "user_id": "2",
+    "medications": [
+      {
+        "drug_name": "Sertraline",
+        "strength": "50 mg",
+        "quantity_left": 22,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": ["09:00"]
+        },
+        "start_date": "2025-02-01"
+      },
+      {
+        "drug_name": "Amoxicillin",
+        "strength": "500 mg",
+        "quantity_left": 12,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": ["08:00", "20:00"]
+        },
+        "start_date": "2025-02-10"
+      }
+    ]
+  }
+]

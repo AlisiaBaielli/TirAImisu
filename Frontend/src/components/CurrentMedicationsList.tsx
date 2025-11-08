@@ -1,5 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pill } from "lucide-react";
+import { useEffect, useState } from "react";
+
+type Medication = {
+  id: string | number;
+  name: string;
+  time: number; // hour 0-23
+  color: string; // e.g. "med-blue"
+};
 
 interface Medication {
   id: number;
@@ -10,11 +18,36 @@ interface Medication {
 }
 
 const CurrentMedicationsList = () => {
-  const medications: Medication[] = [
-    { id: 1, name: "Aspirin 100mg", frequency: "Daily", pillsLeft: 12, color: "med-blue" },
-    { id: 2, name: "Vitamin D 2000IU", frequency: "Weekly", pillsLeft: 4, color: "med-green" },
-    { id: 3, name: "Metformin 500mg", frequency: "Daily", pillsLeft: 20, color: "med-orange" },
-  ];
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const formatHour = (hour: number) => {
+    if (Number.isNaN(hour)) return "";
+    const h = Math.max(0, Math.min(23, Math.trunc(hour)));
+    const suffix = h >= 12 ? "PM" : "AM";
+    const display = h % 12 === 0 ? 12 : h % 12;
+    return `${display}:00 ${suffix}`;
+  };
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+        const res = await fetch(`${base}/api/medications`);
+        if (!res.ok) throw new Error(`Failed to load medications (${res.status})`);
+        const data = await res.json();
+        setMedications(Array.isArray(data?.medications) ? data.medications : []);
+      } catch (e: any) {
+        setError(e?.message ?? "Failed to load medications");
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
 
   return (
     <Card className="animate-fade-in">
@@ -22,7 +55,9 @@ const CurrentMedicationsList = () => {
         <CardTitle className="text-sm font-medium">Current Medications</CardTitle>
       </CardHeader>
       <CardContent>
-        {medications.length === 0 ? (
+        {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+        {error && !loading && <p className="text-sm text-destructive">{error}</p>}
+        {!loading && !error && medications.length === 0 ? (
           <p className="text-sm text-muted-foreground">No medications added yet</p>
         ) : (
           <div className="space-y-2">

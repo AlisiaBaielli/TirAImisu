@@ -1,10 +1,18 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useState } from "react";
+import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { format, addDays, startOfWeek } from "date-fns";
 
-interface MedicationEvent {
-  id: number;
+type ApiEvent = {
+  id?: string;
+  title: string;
+  start: { date_time: string };
+  end: { date_time: string };
+};
+
+interface CalendarChip {
+  id: string | number;
   name: string;
   time: string;
   color: string;
@@ -14,32 +22,80 @@ interface MedicationEvent {
 
 const WeekCalendar = () => {
   const today = new Date();
-  const weekStart = startOfWeek(today);
+  const weekStart = addDays(startOfWeek(today, { weekStartsOn: 1 }), 7);
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
-  const mockEvents: { [key: string]: MedicationEvent[] } = {
-    "0": [
-      { id: 1, name: "Aspirin", time: "08:00", color: "bg-med-blue", frequency: "Daily", startDate: "2025-11-01" },
-      { id: 2, name: "Vitamin D", time: "12:00", color: "bg-med-green", frequency: "Weekly", startDate: "2025-11-03" },
-      { id: 3, name: "Metformin", time: "18:00", color: "bg-med-orange", frequency: "Daily", startDate: "2025-11-01" },
-    ],
-    "1": [
-      { id: 4, name: "Aspirin", time: "08:00", color: "bg-med-blue", frequency: "Daily", startDate: "2025-11-01" },
-      { id: 5, name: "Vitamin D", time: "12:00", color: "bg-med-green", frequency: "Weekly", startDate: "2025-11-03" },
-    ],
-    "2": [
-      { id: 6, name: "Aspirin", time: "08:00", color: "bg-med-blue", frequency: "Daily", startDate: "2025-11-01" },
-      { id: 7, name: "Metformin", time: "18:00", color: "bg-med-orange", frequency: "Daily", startDate: "2025-11-01" },
-    ],
+  const [events, setEvents] = useState<ApiEvent[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+  const calendarId = (import.meta as any)?.env?.VITE_CALENDAR_ID ?? "cal_OODZTUtc1Y";
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events`);
+      if (!res.ok) {
+        throw new Error(`Failed to load events (${res.status})`);
+      }
+      const data = await res.json();
+      setEvents(Array.isArray(data?.events) ? data.events : []);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/calendar/${calendarId}/events/refresh`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to refresh events (${res.status})`);
+      }
+      await fetchEvents();
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to refresh events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const colorPalette = useMemo(() => ["bg-blue-500", "bg-green-500", "bg-orange-500", "bg-purple-500"], []);
+  const hashString = (s: string) => {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) {
+      h = (h << 5) - h + s.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h);
   };
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const [selectedMed, setSelectedMed] = useState<MedicationEvent | null>(null);
+  const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader className="shrink-0">
-        <CardTitle>7-Day Medication Schedule</CardTitle>
+    <Card className="h-[calc(100vh-180px)]">
+      <CardHeader>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>7-Day Medication Schedule</CardTitle>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={refreshEvents} disabled={loading}>
+              {loading ? "Refreshing..." : "Refresh"}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="flex-1 p-0 min-h-0">
         <div className="h-full overflow-auto">
@@ -69,10 +125,24 @@ const WeekCalendar = () => {
                   {hour.toString().padStart(2, "0")}:00
                 </div>
                 {days.map((day, dayIndex) => {
-                  const dayEvents = mockEvents[dayIndex.toString()] || [];
-                  const hourEvents = dayEvents.filter(
-                    (event) => parseInt(event.time.split(":")[0]) === hour
-                  );
+                  const hourEvents: CalendarChip[] = events
+                    .filter((ev) => {
+                      const start = parseISO(ev.start?.date_time ?? "");
+                      return isSameDay(start, day) && start.getHours() === hour;
+                    })
+                    .map((ev, idx) => {
+                      const start = parseISO(ev.start?.date_time ?? "");
+                      const color = colorPalette[hashString(ev.title ?? "") % colorPalette.length];
+                      return {
+                        id: ev.id ?? `${dayIndex}-${hour}-${idx}`,
+                        name: ev.title ?? "Event",
+                        time: format(start, "HH:mm"),
+                        color,
+                      frequency: "once",
+                      startDate: format(start, "yyyy-MM-dd"),
+                      };
+                    });
+
                   return (
                     <div
                       key={dayIndex}
@@ -94,6 +164,14 @@ const WeekCalendar = () => {
                 })}
               </div>
             ))}
+
+            {/* Loading / error states */}
+            {loading && (
+              <div className="p-3 text-xs text-muted-foreground">Loading events…</div>
+            )}
+            {error && !loading && (
+              <div className="p-3 text-xs text-red-500">Error: {error}</div>
+            )}
           </div>
         </div>
       </CardContent>

@@ -74,5 +74,10 @@ def check_interaction(drug_a: str, drug_b: str) -> Dict[str, Any]:
     return result
 
 
+@tool  # ALREADY EXISTS
+def get_calendar_events() -> Dict[str, Any]:
+    return
+
+
 # Export list for create_react_agent()
 TOOLS = [get_current_meds, check_interaction]

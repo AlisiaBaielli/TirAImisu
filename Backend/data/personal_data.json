@@ -1,0 +1,36 @@
+[
+  {
+    "user_id": "1",
+    "username": "jan.jansen",
+    "full_name": "Jan Jansen",
+    "password": "password",
+    "email": "jan.jansen@example.com",
+    "street": "Keizersgracht",
+    "house_number": "1",
+    "city":"Amsterdam",
+    "post_code": "1015CS",
+    "phone_number": "0612345678",
+    "doctor_email": "dr.smit@huisartspraktijk.nl",
+    "cvv": "123",
+    "expiry_date": "12/2027",
+    "credit_card_number": "4242424242424242",
+    "gender": "Female"
+  },
+  {
+    "user_id": "2",
+    "username": "alice.devries",
+    "full_name": "Alice de Vries",
+    "password": "password",
+    "email": "alice.devries@example.com",
+    "street": "Prinsengracht",
+    "house_number": "100",
+    "city":"Amsterdam",
+    "post_code": "1016AB",
+    "phone_number": "0687654321",
+    "doctor_email": "dr.vanderlaan@huisartspraktijk.nl",
+    "cvv": "321",
+    "expiry_date": "06/2028",
+    "credit_card_number": "5555555555554444",
+    "gender": "Male"
+  }
+]
