@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useState } from "react";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { format, addDays, startOfWeek } from "date-fns";
 
 type ApiEvent = {
   id?: string;
@@ -85,7 +83,7 @@ const WeekCalendar = () => {
   };
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const [selectedMed, setSelectedMed] = useState<MedicationEvent | null>(null);
+  const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
   return (
     <Card className="h-[calc(100vh-180px)]">
@@ -140,6 +138,8 @@ const WeekCalendar = () => {
                         name: ev.title ?? "Event",
                         time: format(start, "HH:mm"),
                         color,
+                      frequency: "once",
+                      startDate: format(start, "yyyy-MM-dd"),
                       };
                     });
 
