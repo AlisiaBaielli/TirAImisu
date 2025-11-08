@@ -1,24 +1,10 @@
-from browser_use import Agent, Browser, ChatBrowserUse
 import asyncio
 import dotenv
+from browser_use import Agent, Browser, ChatBrowserUse
+
+from Backend.data.utils import retrieve_medications, _read_json, USER_DATA_FILE
 
 dotenv.load_dotenv()
-# ─────────────────────────────────────────────────────────────
-USER = {
-    "first_name": "Jan",
-    "last_name": "Jansen",
-    "email": "jan.jansen@example.com",
-    "phone": "0612345678",
-    "street": "Keizersgracht 1",
-    "postal_code": "1015CS",
-    "city": "Amsterdam",
-    "country": "Netherlands",
-}
-
-PRODUCT = {
-    "name": "Paracetamol 500 mg",
-    "quantity": 2,  # number of boxes / packs to buy
-}
 
 STORE = {
     "base_url": "https://www.drogist.nl/",
@@ -26,9 +12,39 @@ STORE = {
 }
 
 
-# ─────────────────────────────────────────────────────────────
-# Task prompt for the agent
-# ─────────────────────────────────────────────────────────────
+def load_user(user_id: str) -> dict:
+    users = _read_json(USER_DATA_FILE)
+    for u in users:
+        if u.get("user_id") == user_id:
+            full_name = u.get("full_name", "")
+            names = full_name.split()
+            return {
+                "user_id": u.get("user_id", ""),
+                "age": u.get("age", ""),
+                "username": u.get("username", ""),
+                "full_name": full_name,
+                "first_name": names[0] if names else "",
+                "last_name": names[-1] if names else "",
+                "password": u.get("password", ""),
+                "email": u.get("email", ""),
+                "phone": u.get("phone_number", ""),
+                "phone_number": u.get("phone_number", ""),
+                "street": u.get("street", ""),
+                "house_number": u.get("house_number", ""),
+                "street_full": f"{u.get('street','')} {u.get('house_number','')}".strip(),
+                "postal_code": u.get("post_code", ""),
+                "post_code": u.get("post_code", ""),
+                "city": u.get("city", ""),
+                "country": "Netherlands",
+                "doctor_email": u.get("doctor_email", ""),
+                "cvv": u.get("cvv", ""),
+                "expiry_date": u.get("expiry_date", ""),
+                "credit_card_number": u.get("credit_card_number", ""),
+                "gender": u.get("gender", ""),
+            }
+    raise ValueError(f"User ID {user_id} not found in personal_data.json")
+
+
 def build_task(user, product, store) -> str:
     return f"""
 You are a careful shopping assistant automating a browser.
@@ -36,74 +52,73 @@ You are a careful shopping assistant automating a browser.
 GOAL
 - On {store['base_url']} search for: "{product['name']}".
 - Select an in-stock product that clearly matches the requested name and strength (no substitutes).
-- Set quantity to {product['quantity']} and add to cart.
+- Set quantity to 1 and add to cart.
 - Proceed to checkout and fill shipping details using the info below.
-- STOP BEFORE PAYMENT and summarize the checkout state (cart items, quantity, subtotal, shipping method).
-- Provide screenshots or captured evidence if your environment allows. Return a step-by-step action log.
+- STOP BEFORE PAYMENT and summarize the checkout state.
 
-USER DETAILS (use exactly as written; do not invent data)
+USER DETAILS
 - First name: {user['first_name']}
 - Last name: {user['last_name']}
 - Email: {user['email']}
 - Phone: {user['phone']}
 - Street: {user['street']}
 - Postal code: {user['postal_code']}
+- House number: {user['house_number']}
 - City: {user['city']}
 - Country: {user['country']}
+- Credit card number: {user['credit_card_number']}
+- Expiry date: {user['expiry_date']}
+- CVV: {user['cvv']}
+- Initials: {user['first_name'][0]}{user['last_name'][0]}
 
 CONSTRAINTS
-- Stay on the domain drogist.nl.
-- If a cookie/consent banner appears, accept minimal cookies to proceed.
-- Language: the site is Dutch; use the search bar (look for 'Zoeken').
-- If the exact product is not found, DO NOT buy alternatives; stop and report.
-- If the site requires account login, choose guest checkout if possible.
-- Payment step: DO NOT place or authorize payment. Stop at the payment method screen and summarize.
-- Robustness: if the DOM changes or an element is not found, retry via the site's search input.
-- Always report: final URL, items in cart, unit price, quantity, subtotal, shipping method (if any).
+- Stay on drogist.nl
+- Accept minimal cookies if banner appears
+- Do NOT complete payment — stop before purchase
+- If product not found, do not substitute — report failure
 
 OUTPUT
-- A concise summary with:
-  - success/failure,
-  - product title you picked,
-  - quantity in cart,
-  - price(s) found,
-  - subtotal,
-  - shipping option chosen,
-  - current page URL,
-  - any blockers encountered.
+- success/failure, cart item, price, quantity, subtotal, shipping method, blockers, page URL
 """
 
 
-# ─────────────────────────────────────────────────────────────
-# Runner
-# ─────────────────────────────────────────────────────────────
-async def run_demo():
-    if Agent is None:
-        print(
-            "browser-use is not installed yet. This is the prompt-only demo scaffold."
-        )
-        print(
-            "Once installed, this script will instruct the agent to navigate drogist.nl and stop before payment."
-        )
-        return
+def find_medication_entry(user_id: str, drug_name: str) -> dict:
+    """Return the user's medication entry matching drug_name (case-insensitive)."""
+    meds = retrieve_medications(user_id)
+    if not meds:
+        raise ValueError(f"No medications found for user {user_id}")
 
-    # You can pass args to Browser() if you need headless=False for debugging.
-    browser = Browser(
-        # headless=False,           # uncomment for visible browser during dev
-        # use_cloud=True,           # if you have Browser Use Cloud
-        # start_url=STORE["base_url"]
-    )
+    name = drug_name.lower().strip()
 
+    for med in meds:
+        if med.get("drug_name", "").lower().strip() == name:
+            return med
+
+    available = [m.get("drug_name") for m in meds]
+    raise ValueError(f"Medication '{drug_name}' not found. Available: {available}")
+
+
+async def run_checkout(user_id: str = "1", drug_name: str = ""):
+    """Main function: called from frontend or CLI. Always quantity=1."""
+    if not drug_name:
+        raise ValueError("You must provide a drug_name, e.g. 'Aspirin'.")
+
+    user = load_user(user_id)
+    med = find_medication_entry(user_id, drug_name)
+
+    # Build product search string: "Aspirin 100mg"
+    strength = med.get("strength", "").strip()
+    product_name = f"{drug_name} {strength}".strip()
+
+    product = {"name": product_name, "quantity": 1}
+
+    browser = Browser()
     llm = ChatBrowserUse()
 
     agent = Agent(
-        task=build_task(USER, PRODUCT, STORE),
+        task=build_task(user, product, STORE),
         llm=llm,
         browser=browser,
-        # Optional: guardrails if the library supports them in your version
-        # allowed_domains=["www.drogist.nl", "drogist.nl"],
-        # max_actions=40,
-        # timeout=300,
     )
 
     history = await agent.run()
@@ -111,4 +126,4 @@ async def run_demo():
 
 
 if __name__ == "__main__":
-    asyncio.run(run_demo())
+    asyncio.run(run_checkout(user_id="1", drug_name="Aspirin"))

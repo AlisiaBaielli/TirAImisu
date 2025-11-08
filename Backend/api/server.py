@@ -6,8 +6,13 @@ from pydantic import BaseModel
 import json
 import os
 
+from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
-from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
+from Backend.medications.repository import (
+    get_current_medications,
+    add_medication,
+    get_medication_events,
+)
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timedelta, date
@@ -50,7 +55,14 @@ def _load_json(name: str) -> Any:
 
 
 def _hash_color(name: str) -> str:
-    colors = ["med-blue", "med-green", "med-orange", "med-purple", "med-pink", "med-yellow"]
+    colors = [
+        "med-blue",
+        "med-green",
+        "med-orange",
+        "med-purple",
+        "med-pink",
+        "med-yellow",
+    ]
     h = 0
     for ch in name:
         h = (h * 31 + ord(ch)) & 0xFFFFFFFF
@@ -94,7 +106,8 @@ def login(payload: LoginRequest):
         (
             u
             for u in users
-            if u.get("username") == payload.username and u.get("password") == payload.password
+            if u.get("username") == payload.username
+            and u.get("password") == payload.password
         ),
         None,
     )
@@ -129,7 +142,7 @@ def get_user_medications(user_id: str):
 
     meds: List[Dict[str, Any]] = []
     for i, m in enumerate(entry.get("medications", [])):
-        name = f"{m.get('drug_name', 'Medication')}{f' {m.get('strength')}' if m.get('strength') else ''}".strip()
+        name = f" {m.get('strength')}" if m.get("strength") else ""
         freq = _format_frequency(m.get("schedule") or {})
         color = _hash_color(name)
         meds.append(
@@ -191,13 +204,16 @@ def refresh_calendar_events(calendar_id: str) -> dict:
 
         live = live_list_events(calendar_id)
         if not isinstance(live, list):
-            raise HTTPException(status_code=502, detail="Invalid events format from upstream")
+            raise HTTPException(
+                status_code=502, detail="Invalid events format from upstream"
+            )
         set_events(calendar_id, live)
         return {"events": live}
     except HTTPException:
         raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
+
 
 @app.get("/api/medications")
 def list_medications() -> dict:
@@ -207,6 +223,7 @@ def list_medications() -> dict:
     meds = [m.to_dict() for m in get_current_medications()]
     return {"medications": meds}
 
+
 class MedicationCreate(BaseModel):
     name: str = Field(..., min_length=1)
     time: int = Field(..., ge=0, le=23)
@@ -214,8 +231,9 @@ class MedicationCreate(BaseModel):
     hour_interval: int = Field(24, ge=1)
     description: Optional[str] = None
     start_date: Optional[str] = None  # "YYYY-MM-DD"
-    end_date: Optional[str] = None    # "YYYY-MM-DD"
+    end_date: Optional[str] = None  # "YYYY-MM-DD"
     occurrences: Optional[int] = Field(None, ge=1)
+
 
 @app.post("/api/medications")
 def create_medication(payload: MedicationCreate) -> dict:
@@ -237,7 +255,9 @@ def create_medication(payload: MedicationCreate) -> dict:
         if calendar_id:
             # Determine start datetime
             if payload.start_date:
-                start_date_obj = datetime.strptime(payload.start_date, "%Y-%m-%d").date()
+                start_date_obj = datetime.strptime(
+                    payload.start_date, "%Y-%m-%d"
+                ).date()
             else:
                 start_date_obj = date.today()
             start_dt = datetime(
@@ -253,8 +273,13 @@ def create_medication(payload: MedicationCreate) -> dict:
             occ = payload.occurrences
             if not occ and payload.end_date:
                 try:
-                    end_date_obj = datetime.strptime(payload.end_date, "%Y-%m-%d").date()
-                    total_hours = (datetime.combine(end_date_obj, datetime.min.time()) - datetime.combine(start_date_obj, datetime.min.time())).days * 24
+                    end_date_obj = datetime.strptime(
+                        payload.end_date, "%Y-%m-%d"
+                    ).date()
+                    total_hours = (
+                        datetime.combine(end_date_obj, datetime.min.time())
+                        - datetime.combine(start_date_obj, datetime.min.time())
+                    ).days * 24
                     occ = max(1, (total_hours // med.hour_interval) + 1)
                 except Exception:
                     occ = None
@@ -276,6 +301,7 @@ def create_medication(payload: MedicationCreate) -> dict:
         pass
     return {"medication": med.to_dict()}
 
+
 @app.get("/api/medications/events")
 def list_medication_events() -> dict:
     """
@@ -285,6 +311,7 @@ def list_medication_events() -> dict:
     events = get_medication_events()
     return {"events": events}
 
+
 @app.get("/api/events-calendar/events")
 def get_events_calendar_events() -> dict:
     """
@@ -293,7 +320,10 @@ def get_events_calendar_events() -> dict:
     """
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="EVENTS_CALENDAR_ID env var not set",
+        )
     try:
         events = get_events(calendar_id)
         if events:
@@ -301,6 +331,7 @@ def get_events_calendar_events() -> dict:
         # Best-effort live fetch if cache empty
         try:
             from Backend.calendar.cal_api import list_events as live_list_events
+
             live = live_list_events(calendar_id)
             if isinstance(live, list):
                 set_events(calendar_id, live)
@@ -311,6 +342,7 @@ def get_events_calendar_events() -> dict:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
+
 @app.post("/api/events-calendar/events/refresh")
 def refresh_events_calendar_events() -> dict:
     """
@@ -318,12 +350,18 @@ def refresh_events_calendar_events() -> dict:
     """
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EVENTS_CALENDAR_ID env var not set")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="EVENTS_CALENDAR_ID env var not set",
+        )
     try:
         from Backend.calendar.cal_api import list_events as live_list_events
+
         live = live_list_events(calendar_id)
         if not isinstance(live, list):
-            raise HTTPException(status_code=502, detail="Invalid events format from upstream")
+            raise HTTPException(
+                status_code=502, detail="Invalid events format from upstream"
+            )
         set_events(calendar_id, live)
         return {"events": live}
     except HTTPException:
@@ -332,7 +370,14 @@ def refresh_events_calendar_events() -> dict:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
+@app.get("/buy/{drug_name}")
+async def buy(drug_name: str):
+    result = await run_checkout("1", drug_name)
+    return result
+
+
 # Optional: allow `python -m Backend.api.server` to run the dev server directly
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("Backend.api.server:app", host="0.0.0.0", port=8000, reload=True)
