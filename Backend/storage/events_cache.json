@@ -2047,28 +2047,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/nipjvq0dv4esti9obt27l85dds"
     },
     {
-      "id": "mmjbjmadvod16m1oocfbn6a93g",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-10T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-10T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "mmjbjmadvod16m1oocfbn6a93g",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/mmjbjmadvod16m1oocfbn6a93g"
-    },
-    {
       "id": "5ntgbskqgueo1mk6s26rlaf32c",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -2089,72 +2067,6 @@
       "provider_id": "5ntgbskqgueo1mk6s26rlaf32c",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5ntgbskqgueo1mk6s26rlaf32c"
-    },
-    {
-      "id": "b8svnbe3ciglnva1gbsp8q2k8o",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-11T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-11T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "b8svnbe3ciglnva1gbsp8q2k8o",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/b8svnbe3ciglnva1gbsp8q2k8o"
-    },
-    {
-      "id": "5mmdhb9uiq7ir5bjc0nt4olq88",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-10T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-10T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "5mmdhb9uiq7ir5bjc0nt4olq88",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5mmdhb9uiq7ir5bjc0nt4olq88"
-    },
-    {
-      "id": "82r83k6pot2jp6q2ntlhfn4924",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-11T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-11T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "82r83k6pot2jp6q2ntlhfn4924",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/82r83k6pot2jp6q2ntlhfn4924"
     },
     {
       "id": "22crelridjhdgf0ki5qr1ftmnk",
@@ -2179,160 +2091,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/22crelridjhdgf0ki5qr1ftmnk"
     },
     {
-      "id": "j4nic7cdr9vegk00u3j0ebn060",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-11T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-11T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "j4nic7cdr9vegk00u3j0ebn060",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/j4nic7cdr9vegk00u3j0ebn060"
-    },
-    {
-      "id": "7es32st7nheptq2lvchbnv178g",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-10T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-10T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "7es32st7nheptq2lvchbnv178g",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/7es32st7nheptq2lvchbnv178g"
-    },
-    {
-      "id": "mha6b03t17clk1afvq53029p94",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-12T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-12T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "mha6b03t17clk1afvq53029p94",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/mha6b03t17clk1afvq53029p94"
-    },
-    {
-      "id": "pgar2kgpmp7mih87g1vlialbjo",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-10T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-10T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "pgar2kgpmp7mih87g1vlialbjo",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/pgar2kgpmp7mih87g1vlialbjo"
-    },
-    {
-      "id": "1r54a0j69v41j1jvkj7q050lts",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-10T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-10T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "1r54a0j69v41j1jvkj7q050lts",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/1r54a0j69v41j1jvkj7q050lts"
-    },
-    {
-      "id": "dgholp9gm8c3ec4nkebqfkave0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-13T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-13T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "dgholp9gm8c3ec4nkebqfkave0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/dgholp9gm8c3ec4nkebqfkave0"
-    },
-    {
-      "id": "imk8ecdc4mjsrr0knt2ae8uft4",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-12T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-12T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "imk8ecdc4mjsrr0knt2ae8uft4",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/imk8ecdc4mjsrr0knt2ae8uft4"
-    },
-    {
       "id": "aqh1pe48gj3udklf7l0na3tsts",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -2353,94 +2111,6 @@
       "provider_id": "aqh1pe48gj3udklf7l0na3tsts",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/aqh1pe48gj3udklf7l0na3tsts"
-    },
-    {
-      "id": "ijatgggtetbkh5ca7ntvu50p4k",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-13T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-13T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "ijatgggtetbkh5ca7ntvu50p4k",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ijatgggtetbkh5ca7ntvu50p4k"
-    },
-    {
-      "id": "7rrlr60oc1mi6givpqvdp588os",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-11T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-11T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "7rrlr60oc1mi6givpqvdp588os",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/7rrlr60oc1mi6givpqvdp588os"
-    },
-    {
-      "id": "mqn6iokqbhnphfq7fu0k2e37v0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-14T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-14T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "mqn6iokqbhnphfq7fu0k2e37v0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/mqn6iokqbhnphfq7fu0k2e37v0"
-    },
-    {
-      "id": "ntjvjr2hpqqka5lkp6hd5ggevk",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-11T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-11T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "ntjvjr2hpqqka5lkp6hd5ggevk",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ntjvjr2hpqqka5lkp6hd5ggevk"
     },
     {
       "id": "ejp8khpribfm5onfdiagf5n720",
@@ -2465,314 +2135,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ejp8khpribfm5onfdiagf5n720"
     },
     {
-      "id": "j2nfomv9ddge40p4nu5ul2utuc",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-12T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-12T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "j2nfomv9ddge40p4nu5ul2utuc",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/j2nfomv9ddge40p4nu5ul2utuc"
-    },
-    {
-      "id": "b4hqvnhdscouu94kue5hb6jgv0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-14T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-14T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "b4hqvnhdscouu94kue5hb6jgv0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/b4hqvnhdscouu94kue5hb6jgv0"
-    },
-    {
-      "id": "muro46n8p3psrmk8srmqecntpo",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-12T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-12T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "muro46n8p3psrmk8srmqecntpo",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/muro46n8p3psrmk8srmqecntpo"
-    },
-    {
-      "id": "85rmvuf8pqfsn4gr5qp24kdamc",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-15T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-15T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "85rmvuf8pqfsn4gr5qp24kdamc",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/85rmvuf8pqfsn4gr5qp24kdamc"
-    },
-    {
-      "id": "m775r55o11dukr2j1m83eiddb8",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-12T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-12T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "m775r55o11dukr2j1m83eiddb8",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/m775r55o11dukr2j1m83eiddb8"
-    },
-    {
-      "id": "70aq97pg72ahu7ckalmjjcuc44",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-14T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-14T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "70aq97pg72ahu7ckalmjjcuc44",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/70aq97pg72ahu7ckalmjjcuc44"
-    },
-    {
-      "id": "1n2t3ouhionvb24hh246b0qevg",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-13T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-13T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "1n2t3ouhionvb24hh246b0qevg",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/1n2t3ouhionvb24hh246b0qevg"
-    },
-    {
-      "id": "445vv58v8dh94tpd8bvrjqnrcg",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-15T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-15T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "445vv58v8dh94tpd8bvrjqnrcg",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/445vv58v8dh94tpd8bvrjqnrcg"
-    },
-    {
-      "id": "atj55k4e5agpr7e5h8hi77dj0o",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-13T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-13T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "atj55k4e5agpr7e5h8hi77dj0o",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/atj55k4e5agpr7e5h8hi77dj0o"
-    },
-    {
-      "id": "og5h9iadb31ncuned8a53c989s",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-16T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-16T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "og5h9iadb31ncuned8a53c989s",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/og5h9iadb31ncuned8a53c989s"
-    },
-    {
-      "id": "k5e7itbno7a1cr646l5vtqn85k",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-13T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-13T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "k5e7itbno7a1cr646l5vtqn85k",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/k5e7itbno7a1cr646l5vtqn85k"
-    },
-    {
-      "id": "oiomds8fc1195st6osrhobt6cg",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-15T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-15T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "oiomds8fc1195st6osrhobt6cg",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/oiomds8fc1195st6osrhobt6cg"
-    },
-    {
-      "id": "2pu9j3jkvddpnsipuv1cflpbqk",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-14T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-14T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "2pu9j3jkvddpnsipuv1cflpbqk",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/2pu9j3jkvddpnsipuv1cflpbqk"
-    },
-    {
-      "id": "te49uicsuct9aas7b507dd7g5o",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-16T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-16T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "te49uicsuct9aas7b507dd7g5o",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/te49uicsuct9aas7b507dd7g5o"
-    },
-    {
       "id": "dohb4s4rsrlv8kk5qrosk0qjhk",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -2795,72 +2157,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/dohb4s4rsrlv8kk5qrosk0qjhk"
     },
     {
-      "id": "kd07u5j7rthdee26q7h319t6c0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-17T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-17T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "kd07u5j7rthdee26q7h319t6c0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/kd07u5j7rthdee26q7h319t6c0"
-    },
-    {
-      "id": "5nd4fklnoq8daapcdaruk6f37k",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-14T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-14T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "5nd4fklnoq8daapcdaruk6f37k",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5nd4fklnoq8daapcdaruk6f37k"
-    },
-    {
-      "id": "rou247s8s92ikv7a2otbiehse4",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-16T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-16T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "rou247s8s92ikv7a2otbiehse4",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/rou247s8s92ikv7a2otbiehse4"
-    },
-    {
       "id": "cpph9omc5804jqg3n5cesjb7v0",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -2881,72 +2177,6 @@
       "provider_id": "cpph9omc5804jqg3n5cesjb7v0",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/cpph9omc5804jqg3n5cesjb7v0"
-    },
-    {
-      "id": "9mutl4ndd2514bnumjc3eje9o8",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-17T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-17T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "9mutl4ndd2514bnumjc3eje9o8",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/9mutl4ndd2514bnumjc3eje9o8"
-    },
-    {
-      "id": "olsmanr016vj9uub7saetisrkc",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-15T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-15T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "olsmanr016vj9uub7saetisrkc",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/olsmanr016vj9uub7saetisrkc"
-    },
-    {
-      "id": "pu587duaelsugdrod68l48p21c",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-15T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-15T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "pu587duaelsugdrod68l48p21c",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/pu587duaelsugdrod68l48p21c"
     },
     {
       "id": "9d85k0cmj93m7tn8pvplnllems",
@@ -2993,50 +2223,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/c92ffj1jjp9op2790t494quuho"
     },
     {
-      "id": "nv9t5g3eeqrm5pnmq7c5u61sus",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-16T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-16T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "nv9t5g3eeqrm5pnmq7c5u61sus",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/nv9t5g3eeqrm5pnmq7c5u61sus"
-    },
-    {
-      "id": "v4nfo8qpcasjaqf9vq532rius8",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-18T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-18T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "v4nfo8qpcasjaqf9vq532rius8",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/v4nfo8qpcasjaqf9vq532rius8"
-    },
-    {
       "id": "v981i7i5frf9h6mla2n4qng6fo",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -3057,28 +2243,6 @@
       "provider_id": "v981i7i5frf9h6mla2n4qng6fo",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/v981i7i5frf9h6mla2n4qng6fo"
-    },
-    {
-      "id": "kfd4qj1qo1rreghi65k6t8kkdk",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-16T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-16T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "kfd4qj1qo1rreghi65k6t8kkdk",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/kfd4qj1qo1rreghi65k6t8kkdk"
     },
     {
       "id": "2jnpdvupspfeu87mncfc75qmkk",
@@ -3147,50 +2311,6 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/vb75sn5eia1aj3v8vg9tqj630k"
     },
     {
-      "id": "tvnapb42otf9t985lvepjncgj0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-17T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-17T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "tvnapb42otf9t985lvepjncgj0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/tvnapb42otf9t985lvepjncgj0"
-    },
-    {
-      "id": "ilm8b4ap3ohs72grs7u4pgufhg",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-17T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-17T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "ilm8b4ap3ohs72grs7u4pgufhg",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ilm8b4ap3ohs72grs7u4pgufhg"
-    },
-    {
       "id": "l00us0j2u17u725dnko6u9cr7o",
       "title": "test2 100mg",
       "description": "Added via scan",
@@ -3211,72 +2331,6 @@
       "provider_id": "l00us0j2u17u725dnko6u9cr7o",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/l00us0j2u17u725dnko6u9cr7o"
-    },
-    {
-      "id": "5739lgtnat9d7eogi3tdq4u4rk",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-18T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-18T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "5739lgtnat9d7eogi3tdq4u4rk",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5739lgtnat9d7eogi3tdq4u4rk"
-    },
-    {
-      "id": "5f4a8eutob5a2iqpmvg9terph0",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-18T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-18T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "5f4a8eutob5a2iqpmvg9terph0",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5f4a8eutob5a2iqpmvg9terph0"
-    },
-    {
-      "id": "m19lk0eku72qbk96q22ltlbpf8",
-      "title": "test2 100mg",
-      "description": "Added via scan",
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-18T19:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-18T19:10:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "m19lk0eku72qbk96q22ltlbpf8",
-      "calendar_id": "cal_OODZTUtc1Y",
-      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/m19lk0eku72qbk96q22ltlbpf8"
     },
     {
       "id": "rvo81qdtkuse9hp1pce45toka4",
@@ -5037,6 +4091,952 @@
       "provider_id": "st87jekosc9563bogltu6ik4q0",
       "calendar_id": "cal_OODZTUtc1Y",
       "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/st87jekosc9563bogltu6ik4q0"
+    },
+    {
+      "id": "72p3c2up175hglqotm50umflqs",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-10T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-10T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "72p3c2up175hglqotm50umflqs",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/72p3c2up175hglqotm50umflqs"
+    },
+    {
+      "id": "tm2l32ple7uskm7k91d7vla2tc",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-09T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-09T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "tm2l32ple7uskm7k91d7vla2tc",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/tm2l32ple7uskm7k91d7vla2tc"
+    },
+    {
+      "id": "eckk59vemrm21k36bc727n37fg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-10T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-10T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "eckk59vemrm21k36bc727n37fg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/eckk59vemrm21k36bc727n37fg"
+    },
+    {
+      "id": "ic662i67goqo157vetocq5i6t4",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-13T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-13T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "ic662i67goqo157vetocq5i6t4",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ic662i67goqo157vetocq5i6t4"
+    },
+    {
+      "id": "9nkql7mqdde3350no7gto098to",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-15T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-15T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "9nkql7mqdde3350no7gto098to",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/9nkql7mqdde3350no7gto098to"
+    },
+    {
+      "id": "9ec287rpqginndoq0b7335affo",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-10T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-10T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "9ec287rpqginndoq0b7335affo",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/9ec287rpqginndoq0b7335affo"
+    },
+    {
+      "id": "nkbk1csfhde344cn1t0vu2i3q8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-11T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-11T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "nkbk1csfhde344cn1t0vu2i3q8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/nkbk1csfhde344cn1t0vu2i3q8"
+    },
+    {
+      "id": "kp6nn287v8blhloqba2d304qfs",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-10T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-10T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "kp6nn287v8blhloqba2d304qfs",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/kp6nn287v8blhloqba2d304qfs"
+    },
+    {
+      "id": "rv0lf9j477lb50eqjiraj30oqs",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-11T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-11T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "rv0lf9j477lb50eqjiraj30oqs",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/rv0lf9j477lb50eqjiraj30oqs"
+    },
+    {
+      "id": "d1oj2tlbocd84mtmt6dloflhno",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-12T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-12T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "d1oj2tlbocd84mtmt6dloflhno",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/d1oj2tlbocd84mtmt6dloflhno"
+    },
+    {
+      "id": "ku7cee9pjd4g92fq4k5fvee2hk",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-12T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-12T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "ku7cee9pjd4g92fq4k5fvee2hk",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ku7cee9pjd4g92fq4k5fvee2hk"
+    },
+    {
+      "id": "4m282bbkp3fhbhe92gunpntqkg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-17T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-17T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "4m282bbkp3fhbhe92gunpntqkg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/4m282bbkp3fhbhe92gunpntqkg"
+    },
+    {
+      "id": "tskbcpmu2hn0u3u9hq7e975bp4",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-12T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-12T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "tskbcpmu2hn0u3u9hq7e975bp4",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/tskbcpmu2hn0u3u9hq7e975bp4"
+    },
+    {
+      "id": "77stbj9jjb04e2esei2vln6gq8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-16T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-16T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "77stbj9jjb04e2esei2vln6gq8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/77stbj9jjb04e2esei2vln6gq8"
+    },
+    {
+      "id": "qrr9btqv8ubnp0cjrck7b116po",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-12T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-12T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "qrr9btqv8ubnp0cjrck7b116po",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/qrr9btqv8ubnp0cjrck7b116po"
+    },
+    {
+      "id": "mtsu2u3stjt9bse9vnqsdnektk",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-13T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-13T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "mtsu2u3stjt9bse9vnqsdnektk",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/mtsu2u3stjt9bse9vnqsdnektk"
+    },
+    {
+      "id": "ej1sr3u7b6klemmpeolo5gusq8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "ej1sr3u7b6klemmpeolo5gusq8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ej1sr3u7b6klemmpeolo5gusq8"
+    },
+    {
+      "id": "2oil6paoso0k7li2o4ct1sme20",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-13T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-13T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "2oil6paoso0k7li2o4ct1sme20",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/2oil6paoso0k7li2o4ct1sme20"
+    },
+    {
+      "id": "f62i010tuo4l0hbt6crreuk0lg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-17T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-17T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "f62i010tuo4l0hbt6crreuk0lg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/f62i010tuo4l0hbt6crreuk0lg"
+    },
+    {
+      "id": "32j65r5gvqd9mtd4gmai08t2to",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-14T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-14T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "32j65r5gvqd9mtd4gmai08t2to",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/32j65r5gvqd9mtd4gmai08t2to"
+    },
+    {
+      "id": "6iucq8b0rv35vgm2l20stea9n8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-14T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-14T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "6iucq8b0rv35vgm2l20stea9n8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/6iucq8b0rv35vgm2l20stea9n8"
+    },
+    {
+      "id": "o3ik2v8gdncv9jgjkrl9mqe5pc",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "o3ik2v8gdncv9jgjkrl9mqe5pc",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/o3ik2v8gdncv9jgjkrl9mqe5pc"
+    },
+    {
+      "id": "7bopv775g1b92lv6jppvf14t6g",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-20T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-20T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "7bopv775g1b92lv6jppvf14t6g",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/7bopv775g1b92lv6jppvf14t6g"
+    },
+    {
+      "id": "25bt2dq16vkgjir3r18elpu8ik",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-15T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-15T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "25bt2dq16vkgjir3r18elpu8ik",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/25bt2dq16vkgjir3r18elpu8ik"
+    },
+    {
+      "id": "4ikcib7vushe0si2937g7brcgo",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-16T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-16T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "4ikcib7vushe0si2937g7brcgo",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/4ikcib7vushe0si2937g7brcgo"
+    },
+    {
+      "id": "34uh4lrrs987bvfuqbm3k4amjs",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-16T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-16T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "34uh4lrrs987bvfuqbm3k4amjs",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/34uh4lrrs987bvfuqbm3k4amjs"
+    },
+    {
+      "id": "kmj916nph71rc2h13iqlmjqvok",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-19T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-19T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "kmj916nph71rc2h13iqlmjqvok",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/kmj916nph71rc2h13iqlmjqvok"
+    },
+    {
+      "id": "kuam0epud6eraa8r6r0s7kcgao",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-21T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-21T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "kuam0epud6eraa8r6r0s7kcgao",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/kuam0epud6eraa8r6r0s7kcgao"
+    },
+    {
+      "id": "jot8p9pvdg8cmdjvjgi3vh9m78",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-16T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-16T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "jot8p9pvdg8cmdjvjgi3vh9m78",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/jot8p9pvdg8cmdjvjgi3vh9m78"
+    },
+    {
+      "id": "vgjk40jjroi755c46ohngsmbgg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-17T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-17T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "vgjk40jjroi755c46ohngsmbgg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/vgjk40jjroi755c46ohngsmbgg"
+    },
+    {
+      "id": "92953db79ib7kvk04qc91kj94s",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-22T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-22T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "92953db79ib7kvk04qc91kj94s",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/92953db79ib7kvk04qc91kj94s"
+    },
+    {
+      "id": "tttm9cbv81dd29ma16tscb4mq8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-17T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-17T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "tttm9cbv81dd29ma16tscb4mq8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/tttm9cbv81dd29ma16tscb4mq8"
+    },
+    {
+      "id": "cdapj78srd1se2ctenolr447tg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-21T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-21T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "cdapj78srd1se2ctenolr447tg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/cdapj78srd1se2ctenolr447tg"
+    },
+    {
+      "id": "5krg9g783lufkrlcblv3gbimkc",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-23T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-23T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "5krg9g783lufkrlcblv3gbimkc",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5krg9g783lufkrlcblv3gbimkc"
+    },
+    {
+      "id": "s8mral2rvp5c2brhna7kqbmlf4",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "s8mral2rvp5c2brhna7kqbmlf4",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/s8mral2rvp5c2brhna7kqbmlf4"
+    },
+    {
+      "id": "au5sqh4plg687srq17qbagob5k",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "au5sqh4plg687srq17qbagob5k",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/au5sqh4plg687srq17qbagob5k"
+    },
+    {
+      "id": "4dm8tsr8eqsq5noasrnct438kk",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "4dm8tsr8eqsq5noasrnct438kk",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/4dm8tsr8eqsq5noasrnct438kk"
+    },
+    {
+      "id": "5kt5o2jmihd4uh7ifie9pa7kjk",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-18T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-18T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "5kt5o2jmihd4uh7ifie9pa7kjk",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/5kt5o2jmihd4uh7ifie9pa7kjk"
+    },
+    {
+      "id": "mr3v1hr0jmvf1jntlpr1kt7c1o",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-24T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-24T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "mr3v1hr0jmvf1jntlpr1kt7c1o",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/mr3v1hr0jmvf1jntlpr1kt7c1o"
+    },
+    {
+      "id": "cec58e1oiav4i0gdglsjkqamvg",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-22T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-22T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "cec58e1oiav4i0gdglsjkqamvg",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/cec58e1oiav4i0gdglsjkqamvg"
+    },
+    {
+      "id": "rbm128chegd1i3os11ou5bvrt8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-19T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-19T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "rbm128chegd1i3os11ou5bvrt8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/rbm128chegd1i3os11ou5bvrt8"
+    },
+    {
+      "id": "9ushp1j5r1qom71sdjkq7qac6g",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-25T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-25T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "9ushp1j5r1qom71sdjkq7qac6g",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/9ushp1j5r1qom71sdjkq7qac6g"
+    },
+    {
+      "id": "ta2emsq2tgns4c8lijk94fqvf8",
+      "title": "test2 100mg",
+      "description": "Added via scan",
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-12-20T19:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-12-20T19:10:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "ta2emsq2tgns4c8lijk94fqvf8",
+      "calendar_id": "cal_OODZTUtc1Y",
+      "canonical_url": "https://api.calapi.io/calendars/cal_OODZTUtc1Y/events/ta2emsq2tgns4c8lijk94fqvf8"
     }
   ]
 }
