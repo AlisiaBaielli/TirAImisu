@@ -1,53 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Pill } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface Medication {
   id: number | string;
   name: string;
   frequency: string;
   pillsLeft: number;
-  color?: string; // e.g., "med-blue" -> CSS var --med-blue
-}
-
-const PALETTE = ["med-blue", "med-green", "med-orange", "med-purple", "med-pink", "med-yellow"] as const;
-
-function hashString(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = (h * 31 + s.charCodeAt(i)) | 0;
-  }
-  return Math.abs(h);
-}
-
-function ensureUniqueColors(items: Medication[]): Medication[] {
-  const used = new Set<string>();
-  return items.map((m) => {
-    const base = typeof m.color === "string" && m.color ? m.color : PALETTE[hashString(m.name) % PALETTE.length];
-    let color = base;
-    if (used.has(color)) {
-      const start = PALETTE.indexOf(base as any);
-      for (let i = 1; i < PALETTE.length; i++) {
-        const candidate = PALETTE[(start + i) % PALETTE.length];
-        if (!used.has(candidate)) {
-          color = candidate;
-          break;
-        }
-      }
-    }
-    used.add(color);
-    return { ...m, color };
-  });
+  color?: string; // e.g., "med-blue"
 }
 
 const VISIBLE_ROWS = 3;
-const ROW_HEIGHT = 56; // px per row (approx)
-const GAP = 8;         // px for space-y-2
-const LIST_HEIGHT = VISIBLE_ROWS * ROW_HEIGHT + (VISIBLE_ROWS - 1) * GAP; // exact 3 rows visible
+const ROW_HEIGHT = 56;
+const GAP = 8;
+const LIST_HEIGHT = VISIBLE_ROWS * ROW_HEIGHT + (VISIBLE_ROWS - 1) * GAP;
 
 const CurrentMedicationsList = () => {
   const [medications, setMedications] = useState<Medication[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
@@ -79,8 +49,6 @@ const CurrentMedicationsList = () => {
     return () => window.removeEventListener("medications:updated", handler);
   }, [load]);
 
-  const coloredMeds = useMemo(() => ensureUniqueColors(medications), [medications]);
-
   return (
     <Card className="animate-fade-in">
       <CardHeader className="pb-3">
@@ -89,35 +57,32 @@ const CurrentMedicationsList = () => {
       <CardContent className="min-h-0">
         {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
         {error && !loading && <p className="text-sm text-destructive">{error}</p>}
-        {!loading && !error && coloredMeds.length === 0 ? (
+        {!loading && !error && medications.length === 0 ? (
           <p className="text-sm text-muted-foreground">No medications added yet</p>
         ) : (
-          <div
-            className="space-y-2 overflow-y-auto custom-scrollbar"
-            style={{ height: LIST_HEIGHT }}
-          >
-            {coloredMeds.map((med) => (
-              <div
-                key={med.id}
-                className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-all hover-scale cursor-pointer"
-                style={{ height: ROW_HEIGHT - 8 }} // adjust for padding to keep 56px row total
-              >
+          <div className="space-y-2 overflow-y-auto custom-scrollbar" style={{ height: LIST_HEIGHT }}>
+            {medications.map((med) => {
+              const c = med.color || "med-blue";
+              return (
                 <div
-                  className="p-1.5 rounded-md"
-                  style={{ backgroundColor: `hsl(var(--${med.color}) / 0.2)` }}
+                  key={med.id}
+                  className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-all cursor-pointer"
+                  style={{ height: ROW_HEIGHT - 8 }}
                 >
-                  <Pill className="h-4 w-4" style={{ color: `hsl(var(--${med.color}))` }} />
+                  <div className="p-1.5 rounded-md" style={{ backgroundColor: `hsl(var(--${c}) / 0.18)` }}>
+                    <Pill className="h-4 w-4" style={{ color: `hsl(var(--${c}))` }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: `hsl(var(--${c}))` }}>
+                      {med.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      <strong>Frequency:</strong> {med.frequency} | <strong>Pills left:</strong> {med.pillsLeft}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: `hsl(var(--${med.color}))` }}>
-                    {med.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    <strong>Frequency:</strong> {med.frequency} | <strong>Pills left:</strong> {med.pillsLeft}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>

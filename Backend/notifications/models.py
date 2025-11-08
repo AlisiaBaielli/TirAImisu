@@ -7,6 +7,7 @@ from typing import Optional, Dict, Any
 class NotificationCategory(str, Enum):
     REMINDER = "reminder"     # blue
     LOW_STOCK = "low_stock"   # red
+    EVENT_SOON = "event_soon" # blue (informational)
 
 
 class Notification(BaseModel):

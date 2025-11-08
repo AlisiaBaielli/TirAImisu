@@ -1,13 +1,18 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from typing import Any, Dict, List
-from pydantic import BaseModel
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
 import json
 import os
+import uuid
+from datetime import datetime, timedelta, date
+from fastapi import status
+import logging
 
 from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
+<<<<<<< HEAD
 from Backend.medications.repository import (
     get_current_medications,
     add_medication,
@@ -16,13 +21,17 @@ from Backend.medications.repository import (
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timedelta, date
+=======
+from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
+>>>>>>> b4eeaf1e70144e92517079368b193f854d0dd36e
 from Backend.calendar.cal_tools import create_recurring_events
-from fastapi import status
 from Backend.notifications.service import get_notifications as build_notifications
+from Backend.agents.camera_agent.agent import CameraAgent
+from Backend.data.utils import add_new_medication, retrieve_medications, ensure_colors
 
 app = FastAPI(title="PillPal API", version="1.0.0")
+logger = logging.getLogger("api")
 
-# Allow local dev (add 5173 for Vite)
 allowed_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -54,6 +63,7 @@ def _load_json(name: str) -> Any:
         raise HTTPException(status_code=500, detail=f"Invalid JSON in {name}: {exc}")
 
 
+<<<<<<< HEAD
 def _hash_color(name: str) -> str:
     colors = [
         "med-blue",
@@ -69,6 +79,8 @@ def _hash_color(name: str) -> str:
     return colors[h % len(colors)]
 
 
+=======
+>>>>>>> b4eeaf1e70144e92517079368b193f854d0dd36e
 def _format_frequency(schedule: Dict[str, Any]) -> str:
     t = (schedule or {}).get("type")
     if t == "daily":
@@ -93,7 +105,6 @@ def health() -> dict:
     return {"status": "ok"}
 
 
-# -------- Auth --------
 class LoginRequest(BaseModel):
     username: str
     password: str
@@ -103,25 +114,15 @@ class LoginRequest(BaseModel):
 def login(payload: LoginRequest):
     users = _load_json("personal_data.json")
     user = next(
-        (
-            u
-            for u in users
-            if u.get("username") == payload.username
-            and u.get("password") == payload.password
-        ),
+        (u for u in users if u.get("username") == payload.username and u.get("password") == payload.password),
         None,
     )
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    # Remove sensitive fields you do not want to expose (keep credit card only if required)
-    sanitized = {k: v for k, v in user.items() if k not in ["password"]}
-    return {
-        "user_id": user["user_id"],
-        "user": sanitized,
-    }
+    sanitized = {k: v for k, v in user.items() if k != "password"}
+    return {"user_id": user["user_id"], "user": sanitized}
 
 
-# -------- Personal data --------
 @app.get("/api/users/{user_id}")
 def get_user(user_id: str):
     users = _load_json("personal_data.json")
@@ -132,19 +133,24 @@ def get_user(user_id: str):
     return {"user": sanitized}
 
 
-# -------- Medications --------
 @app.get("/api/users/{user_id}/medications")
 def get_user_medications(user_id: str):
-    data = _load_json("personal_medication.json")
-    entry = next((u for u in data if u.get("user_id") == user_id), None)
-    if not entry:
+    # ensure every medication has a persistent color, then return stored meds
+    try:
+        ensure_colors(user_id)
+    except Exception:
+        # noop — fallback to reading file below
+        pass
+
+    meds_raw = retrieve_medications(user_id)
+    if not meds_raw:
         return {"medications": []}
 
     meds: List[Dict[str, Any]] = []
-    for i, m in enumerate(entry.get("medications", [])):
-        name = f" {m.get('strength')}" if m.get("strength") else ""
+    for i, m in enumerate(meds_raw):
+        name = f"{m.get('drug_name', 'Medication')}{f' {m.get('strength')}' if m.get('strength') else ''}".strip()
         freq = _format_frequency(m.get("schedule") or {})
-        color = _hash_color(name)
+        color = m.get("color") or "med-blue"
         meds.append(
             {
                 "id": i,
@@ -157,69 +163,17 @@ def get_user_medications(user_id: str):
     return {"medications": meds}
 
 
-# Back-compat (default user 1)
-@app.get("/api/medications")
-def list_medications() -> dict:
-    return get_user_medications("1")
-
-
-# -------- Calendar (unchanged logic) --------
-@app.get("/api/calendar/{calendar_id}/events")
-def get_calendar_events(calendar_id: str) -> dict:
-    try:
-        events = get_events(calendar_id)
-        if events:
-            return {"events": events}
-        try:
-            from Backend.calendar.cal_api import list_events as live_list_events
-
-            live = live_list_events(calendar_id)
-            if isinstance(live, list):
-                set_events(calendar_id, live)
-                return {"events": live}
-        except Exception:
-            pass
-        return {"events": []}
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
-
-
 @app.get("/api/notifications")
 def list_notifications() -> dict:
-    """
-    Return dynamic notifications:
-      - reminder (blue): doses starting within the next 30 minutes
-      - low_stock (red): medications projected to run out within 7 days
-    """
     try:
         return build_notifications()
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
-
-
-@app.post("/api/calendar/{calendar_id}/events/refresh")
-def refresh_calendar_events(calendar_id: str) -> dict:
-    try:
-        from Backend.calendar.cal_api import list_events as live_list_events
-
-        live = live_list_events(calendar_id)
-        if not isinstance(live, list):
-            raise HTTPException(
-                status_code=502, detail="Invalid events format from upstream"
-            )
-        set_events(calendar_id, live)
-        return {"events": live}
-    except HTTPException:
-        raise
-    except Exception as exc:
+        logger.exception("Failed to build notifications")
         raise HTTPException(status_code=500, detail=str(exc))
 
 
 @app.get("/api/medications")
 def list_medications() -> dict:
-    """
-    Return the current medications, serialized from the Medication class.
-    """
     meds = [m.to_dict() for m in get_current_medications()]
     return {"medications": meds}
 
@@ -230,16 +184,14 @@ class MedicationCreate(BaseModel):
     color: str = Field("med-blue")
     hour_interval: int = Field(24, ge=1)
     description: Optional[str] = None
-    start_date: Optional[str] = None  # "YYYY-MM-DD"
-    end_date: Optional[str] = None  # "YYYY-MM-DD"
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
     occurrences: Optional[int] = Field(None, ge=1)
 
 
 @app.post("/api/medications")
 def create_medication(payload: MedicationCreate) -> dict:
-    """
-    Append a new medication to the CSV store and return the created item.
-    """
+    # keep existing behaviour; repository will handle scheduling/calendar
     med = add_medication(
         name=payload.name.strip(),
         time=payload.time,
@@ -248,12 +200,9 @@ def create_medication(payload: MedicationCreate) -> dict:
         description=payload.description.strip() if payload.description else None,
         start_date=payload.start_date,
     )
-
-    # Best-effort: create recurring calendar events
     try:
         calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
         if calendar_id:
-            # Determine start datetime
             if payload.start_date:
                 start_date_obj = datetime.strptime(
                     payload.start_date, "%Y-%m-%d"
@@ -268,14 +217,10 @@ def create_medication(payload: MedicationCreate) -> dict:
                 minute=0,
             )
             end_dt = start_dt + timedelta(minutes=10)
-
-            # Determine occurrences
             occ = payload.occurrences
             if not occ and payload.end_date:
                 try:
-                    end_date_obj = datetime.strptime(
-                        payload.end_date, "%Y-%m-%d"
-                    ).date()
+                    end_date_obj = datetime.strptime(payload.end_date, "%Y-%m-%d").date()
                     total_hours = (
                         datetime.combine(end_date_obj, datetime.min.time())
                         - datetime.combine(start_date_obj, datetime.min.time())
@@ -284,8 +229,7 @@ def create_medication(payload: MedicationCreate) -> dict:
                 except Exception:
                     occ = None
             if not occ:
-                occ = 7  # default one week of occurrences
-
+                occ = 7
             create_recurring_events(
                 calendar_id=calendar_id,
                 title=med.name,
@@ -297,27 +241,18 @@ def create_medication(payload: MedicationCreate) -> dict:
                 location=None,
             )
     except Exception:
-        # Do not fail the request if calendar creation fails
         pass
     return {"medication": med.to_dict()}
 
 
 @app.get("/api/medications/events")
 def list_medication_events() -> dict:
-    """
-    Return medication-derived events generated from personal_medication.json
-    (expanded with start_date and quantity_left).
-    """
     events = get_medication_events()
     return {"events": events}
 
 
 @app.get("/api/events-calendar/events")
 def get_events_calendar_events() -> dict:
-    """
-    Return cached events for the EVENTS_CALENDAR_ID specified in the backend environment.
-    Falls back to best-effort live fetch when cache is empty.
-    """
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
         raise HTTPException(
@@ -328,7 +263,6 @@ def get_events_calendar_events() -> dict:
         events = get_events(calendar_id)
         if events:
             return {"events": events}
-        # Best-effort live fetch if cache empty
         try:
             from Backend.calendar.cal_api import list_events as live_list_events
 
@@ -345,9 +279,6 @@ def get_events_calendar_events() -> dict:
 
 @app.post("/api/events-calendar/events/refresh")
 def refresh_events_calendar_events() -> dict:
-    """
-    Force refresh for EVENTS_CALENDAR_ID and persist to cache.
-    """
     calendar_id = os.getenv("EVENTS_CALENDAR_ID")
     if not calendar_id:
         raise HTTPException(
@@ -369,7 +300,6 @@ def refresh_events_calendar_events() -> dict:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
-
 @app.get("/buy/{drug_name}")
 async def buy(drug_name: str):
     result = await run_checkout("1", drug_name)
@@ -377,6 +307,79 @@ async def buy(drug_name: str):
 
 
 # Optional: allow `python -m Backend.api.server` to run the dev server directly
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("Backend.api.server:app", host="0.0.0.0", port=8000, reload=True)
+    
+# ─────────── Camera scan endpoint persists result using utils ─────────── #
+class CameraScanRequest(BaseModel):
+    user_id: str
+    image_b64: str
+
+
+class CameraScanResponse(BaseModel):
+    medication_name: Optional[str]
+    dosage: Optional[str]
+    num_pills: Optional[int]
+    color: Optional[str]
+
+
+camera_agent = CameraAgent()
+
+
+@app.post("/api/camera-agent/scan", response_model=CameraScanResponse)
+def camera_agent_scan(payload: CameraScanRequest):
+    if not payload.image_b64:
+        raise HTTPException(status_code=400, detail="image_b64 required")
+    try:
+        result = camera_agent.graph.invoke(
+            {
+                "user_id": payload.user_id,
+                "image_b64": payload.image_b64,
+                "activity": [],
+            },
+            config={"configurable": {"thread_id": f"scan-{payload.user_id}-{uuid.uuid4()}"}},
+        )
+    except Exception:
+        result = camera_agent.run(json.dumps({"user_id": payload.user_id, "image_b64": payload.image_b64}))
+
+    extracted = result.get("extracted") or {}
+    med_name = extracted.get("medication_name")
+    dosage = extracted.get("dosage")
+    num_pills = extracted.get("num_pills")
+
+    color_assigned = None
+    if med_name:
+        # Build record and call add_new_medication which will assign a unique color if missing
+        new_med = {
+            "drug_name": med_name,
+            "strength": dosage or "",
+            "quantity_left": num_pills if isinstance(num_pills, int) else 0,
+            "dose_per_intake": 1,
+            "schedule": {},
+            "start_date": date.today().isoformat(),
+        }
+        try:
+            add_new_medication(payload.user_id, new_med)
+            # read back assigned color
+            meds = retrieve_medications(payload.user_id)
+            # find last added matching name (best-effort)
+            for m in reversed(meds):
+                if m.get("drug_name") == med_name and (m.get("strength") or "") == (dosage or ""):
+                    color_assigned = m.get("color")
+                    break
+        except Exception:
+            pass
+
+    return CameraScanResponse(
+        medication_name=med_name,
+        dosage=dosage,
+        num_pills=num_pills,
+        color=color_assigned,
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
 

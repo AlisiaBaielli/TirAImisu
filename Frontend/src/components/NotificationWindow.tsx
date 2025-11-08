@@ -7,7 +7,7 @@ import { toast } from "sonner";
 // Slightly reduced height for a more compact panel
 const NOTIFICATION_HEIGHT = 190; // px
 
-type NotificationCategory = "reminder" | "low_stock";
+type NotificationCategory = "reminder" | "low_stock" | "event_soon";
 
 type NotificationItem = {
   id: string;
@@ -15,7 +15,7 @@ type NotificationItem = {
   title: string;
   message: string;
   due_at: string;
-  color: string; // "blue" | "red"
+  color: string; // "blue" | "red" | "brown"
   metadata?: Record<string, any>;
 };
 
@@ -36,6 +36,9 @@ const NotificationWindow = () => {
   const colorClasses = (n: NotificationItem) => {
     if (n.category === "low_stock" || n.color === "red") {
       return "border-destructive/30 bg-destructive/10";
+    }
+    if (n.category === "event_soon" || n.color === "brown") {
+      return "border-amber-600/30 bg-amber-600/10";
     }
     return "border-primary/30 bg-primary/10"; // reminder (blue)
   };
@@ -122,7 +125,7 @@ const NotificationWindow = () => {
                   No
                 </Button>
               </div>
-            ) : (
+            ) : n.category === "low_stock" ? (
               <div className="flex gap-2">
                 <Button size="sm" variant="destructive" onClick={() => handleOrder(n)} className="flex-1 h-8 py-1">
                   Order it
@@ -131,7 +134,7 @@ const NotificationWindow = () => {
                   Dismiss
                 </Button>
               </div>
-            )}
+            ) : null}
           </div>
         ))}
       </CardContent>

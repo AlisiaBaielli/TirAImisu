@@ -59,7 +59,7 @@ const ScanMedicationButton = () => {
         onClick={() => setScanOpen(true)}
       >
         <Camera className="h-5 w-5" />
-        Scan Medication
+        Add Medication
       </Button>
 
       <ScanMedicationDialog open={scanOpen} onOpenChange={setScanOpen} onConfirm={handleScanConfirm} />
