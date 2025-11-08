@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { User, MessageCircle } from "lucide-react";
+import { User } from "lucide-react";
 import NotificationWindow from "@/components/NotificationWindow";
 import CurrentMedicationsList from "@/components/CurrentMedicationsList";
 import WeekCalendar from "@/components/WeekCalendar";
 import ScanMedicationButton from "@/components/ScanMedicationButton";
+import AIAssistantChat from "@/components/AIAssistantChat";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -14,15 +15,11 @@ const Dashboard = () => {
   useEffect(() => {
     const isAuth = localStorage.getItem("isAuthenticated");
     const user = localStorage.getItem("username");
-    
     if (!isAuth) {
       navigate("/");
       return;
     }
-    
-    if (user) {
-      setUsername(user);
-    }
+    if (user) setUsername(user);
   }, [navigate]);
 
   const handleLogout = () => {
@@ -32,27 +29,22 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-40 animate-fade-in">
+    <div className="h-screen overflow-hidden bg-background flex flex-col">
+      <header className="border-b bg-card/50 backdrop-blur-sm shrink-0">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold text-primary">PillPal</h1>
-            {username && <span className="text-sm text-muted-foreground">Welcome, {username}</span>}
+            {username && (
+              <span className="text-sm text-muted-foreground">
+                Welcome, {username}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/chat")}
-              className="gap-2 hover-scale"
-            >
-              <MessageCircle className="h-4 w-4" />
-              Chat
-            </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => navigate("/my-data")}
-              className="gap-2 hover-scale"
+              className="gap-2"
             >
               <User className="h-4 w-4" />
               My Data
@@ -64,23 +56,21 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-6 max-h-[calc(100vh-80px)] overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-          {/* Left Column - Notifications and Medications */}
-          <div className="space-y-6 animate-fade-in">
+      <div className="flex-1 container mx-auto px-4 py-6 overflow-hidden">
+        {/* 2-column layout; left uses 3 fixed rows (chat fixed height), right spans them */}
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-6 h-full">
+          <div className="grid grid-rows-[auto_auto_340px] gap-6 h-full min-h-0">
             <NotificationWindow />
             <CurrentMedicationsList />
+            <AIAssistantChat /> {/* fills 340px row; internal messages scroll */}
           </div>
-
-          {/* Right Column - Calendar */}
-          <div className="lg:col-span-2 animate-fade-in">
-            <WeekCalendar />
+          <div className="h-full min-h-0">
+            <WeekCalendar /> {/* spans same total height; bottom aligns with chat bottom */}
           </div>
         </div>
       </div>
 
-      {/* Floating Scan Button */}
+      {/* Floating scan button overlapping calendar */}
       <ScanMedicationButton />
     </div>
   );

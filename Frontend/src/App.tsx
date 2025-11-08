@@ -22,7 +22,6 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-data" element={<MyData />} />
           <Route path="/chat" element={<Chat />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
