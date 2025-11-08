@@ -13,9 +13,11 @@ from typing import Optional
 from datetime import datetime, timedelta, date
 from Backend.calendar.cal_tools import create_recurring_events
 from fastapi import status
+import logging
 from Backend.notifications.service import get_notifications as build_notifications
 
 app = FastAPI(title="PillPal API", version="1.0.0")
+logger = logging.getLogger("api")
 
 # Allow local dev (add 5173 for Vite)
 allowed_origins = [
@@ -177,10 +179,12 @@ def list_notifications() -> dict:
     Return dynamic notifications:
       - reminder (blue): doses starting within the next 30 minutes
       - low_stock (red): medications projected to run out within 7 days
+      - event_soon (blue): there is a medication today and an event within 3 hours
     """
     try:
         return build_notifications()
     except Exception as exc:
+        logger.exception("Failed to build notifications")
         raise HTTPException(status_code=500, detail=str(exc))
 
 

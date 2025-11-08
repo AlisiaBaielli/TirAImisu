@@ -5083,6 +5083,28 @@
       "provider_id": "4s6qdbru3mgc0uaec6egc65af3",
       "calendar_id": "cal_wqLqsEcnzX",
       "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/4s6qdbru3mgc0uaec6egc65af3"
+    },
+    {
+      "id": "6fluuvs8tbd9keg5tg63ce62a2",
+      "title": "AISO Drinks",
+      "description": null,
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-11-08T21:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-11-08T22:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "6fluuvs8tbd9keg5tg63ce62a2",
+      "calendar_id": "cal_wqLqsEcnzX",
+      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/6fluuvs8tbd9keg5tg63ce62a2"
     }
   ]
 }

@@ -36,3 +36,5 @@ packaging==24.2
 pandas==2.2.3
 prompt_toolkit==3.0.50
 opencv-python
+dotenv
+fastapi
