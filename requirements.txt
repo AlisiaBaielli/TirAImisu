@@ -1,1 +1,4 @@
+dotenv
 pytz
+requests
+python-dotenv

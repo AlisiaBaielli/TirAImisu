@@ -2,10 +2,24 @@ import requests
 from datetime import datetime
 import pytz  # pip install pytz
 import os
+from dotenv import load_dotenv
 
-API_TOKEN = os.getenv("API_TOKEN")
-BASE_URL = os.getenv("BASE_URL")
+# Load variables from a local .env file if present
+load_dotenv()
+
+API_TOKEN = os.getenv("CAL_API_TOKEN")
+BASE_URL = os.getenv("CAL_API_BASE_URL")
 TIMEZONE = os.getenv("TIMEZONE")
+
+# Validate and normalize required environment variables early to fail fast
+if not BASE_URL:
+    raise RuntimeError("Missing BASE_URL. Set it in your environment or .env (e.g., https://api.example.com).")
+if not (BASE_URL.startswith("http://") or BASE_URL.startswith("https://")):
+    raise RuntimeError(f"BASE_URL must include http(s) scheme, got: '{BASE_URL}'. Example: https://api.example.com")
+BASE_URL = BASE_URL.rstrip("/")
+
+if not API_TOKEN:
+    raise RuntimeError("Missing API_TOKEN. Set it in your environment or .env.")
 
 HEADERS = {
     "Authorization": f"Bearer {API_TOKEN}",
