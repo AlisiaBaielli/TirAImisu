@@ -6,34 +6,15 @@ from typing import Optional, List # Keep List
 from pydantic import BaseModel, Field
 # No more itertools
 
-# --- Setup ---
-# 1. Install required libraries:
-#    pip install requests openai pydantic
-#
-# 2. Set your OpenRouter API Key:
-#    export OPENROUTER_API_KEY='sk-or-your-key-here'
-# ----------------
-
-# --- Pydantic Model (Unchanged) ---
+# Pydantic Model 
 class InteractionReport(BaseModel):
     interaction_found: bool = Field(..., description="Set to true if an interaction is found, false otherwise.")
     severity: Optional[str] = Field(None, description="The severity of the interaction (e.g., 'Mild', 'Moderate', 'Severe') if found.")
     description: Optional[str] = Field(None, description="A concise, one-sentence summary of the interaction if found.")
     extended_description: Optional[str] = Field(None, description="A detailed explanation of the interaction's mechanism, effects, and management if found.")
 
-# ---------------------------------------------
-
-# --- Initialize Client (Unchanged) ---
-api_key = os.environ.get("OPENROUTER_API_KEY")
-
 try:
-    if not api_key:
-        raise openai.OpenAIError("OPENROUTER_API_KEY environment variable is not set.")
-    
-    client = openai.OpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=api_key
-    )
+    client = openai.OpenAI()
 except openai.OpenAIError as e:
     print(f"Error initializing OpenRouter client: {e}")
     exit()
@@ -110,7 +91,7 @@ def check_interaction_with_llm(interaction_text: str, drug_a_name: str, drug_b_n
     ]
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini", # Reliable paid model
+            model="gpt-4o-mini", # Reliable paid model
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -128,7 +109,7 @@ def check_interaction_with_llm(interaction_text: str, drug_a_name: str, drug_b_n
             print("🤖 LLM did not call the tool as expected.")
             return None
     except openai.OpenAIError as e:
-        print(f"Error calling OpenRouter API: {e}")
+        print(f"Error calling OpenAI API: {e}")
         return None
     except json.JSONDecodeError as e:
         print(f"Error parsing LLM response: {e}")
@@ -181,7 +162,7 @@ def synthesize_reports(reports: List[InteractionReport], drug_a: str, drug_b: st
     ]
     try:
         response = client.chat.completions.create(
-            model="openai/gpt-4o-mini",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -200,7 +181,7 @@ def synthesize_reports(reports: List[InteractionReport], drug_a: str, drug_b: st
             print("🤖 LLM did not call the synthesis tool as expected.")
             return None
     except openai.OpenAIError as e:
-        print(f"Error calling OpenRouter API during synthesis: {e}")
+        print(f"Error calling OpenAI API during synthesis: {e}")
         return None
     except json.JSONDecodeError as e:
         print(f"Error parsing LLM synthesis response: {e}")
