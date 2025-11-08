@@ -18,6 +18,7 @@ import dotenv
 
 dotenv.load_dotenv()
 
+# TODO ADD USER CONTEXT AND ID TO PROMPT
 SYSTEM_PROMPT = SystemMessage(
     content=(
         "You are a medication assistant. Be concise and safe.\n"
