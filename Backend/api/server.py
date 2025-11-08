@@ -12,7 +12,11 @@ import logging
 
 from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
-from Backend.medications.repository import get_current_medications, add_medication, get_medication_events
+from Backend.medications.repository import (
+    get_current_medications,
+    add_medication,
+    get_medication_events,
+)
 from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
@@ -85,7 +89,12 @@ class LoginRequest(BaseModel):
 def login(payload: LoginRequest):
     users = _load_json("personal_data.json")
     user = next(
-        (u for u in users if u.get("username") == payload.username and u.get("password") == payload.password),
+        (
+            u
+            for u in users
+            if u.get("username") == payload.username
+            and u.get("password") == payload.password
+        ),
         None,
     )
     if not user:
@@ -119,7 +128,7 @@ def get_user_medications(user_id: str):
 
     meds: List[Dict[str, Any]] = []
     for i, m in enumerate(meds_raw):
-        name = f"{m.get('drug_name', 'Medication')}{f' {m.get('strength')}' if m.get('strength') else ''}".strip()
+        name = f" {m.get('strength')}" if m.get("strength") else ""
         freq = _format_frequency(m.get("schedule") or {})
         color = m.get("color") or "med-blue"
         meds.append(
@@ -191,7 +200,9 @@ def create_medication(payload: MedicationCreate) -> dict:
             occ = payload.occurrences
             if not occ and payload.end_date:
                 try:
-                    end_date_obj = datetime.strptime(payload.end_date, "%Y-%m-%d").date()
+                    end_date_obj = datetime.strptime(
+                        payload.end_date, "%Y-%m-%d"
+                    ).date()
                     total_hours = (
                         datetime.combine(end_date_obj, datetime.min.time())
                         - datetime.combine(start_date_obj, datetime.min.time())
@@ -271,7 +282,8 @@ def refresh_events_calendar_events() -> dict:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))
 
-@app.get("/buy/{drug_name}")
+
+@app.post("/api/buy/{drug_name}")
 async def buy(drug_name: str):
     result = await run_checkout("1", drug_name)
     return result
@@ -304,10 +316,14 @@ def camera_agent_scan(payload: CameraScanRequest):
                 "image_b64": payload.image_b64,
                 "activity": [],
             },
-            config={"configurable": {"thread_id": f"scan-{payload.user_id}-{uuid.uuid4()}"}},
+            config={
+                "configurable": {"thread_id": f"scan-{payload.user_id}-{uuid.uuid4()}"}
+            },
         )
     except Exception:
-        result = camera_agent.run(json.dumps({"user_id": payload.user_id, "image_b64": payload.image_b64}))
+        result = camera_agent.run(
+            json.dumps({"user_id": payload.user_id, "image_b64": payload.image_b64})
+        )
 
     extracted = result.get("extracted") or {}
     med_name = extracted.get("medication_name")
@@ -331,7 +347,9 @@ def camera_agent_scan(payload: CameraScanRequest):
             meds = retrieve_medications(payload.user_id)
             # find last added matching name (best-effort)
             for m in reversed(meds):
-                if m.get("drug_name") == med_name and (m.get("strength") or "") == (dosage or ""):
+                if m.get("drug_name") == med_name and (m.get("strength") or "") == (
+                    dosage or ""
+                ):
                     color_assigned = m.get("color")
                     break
         except Exception:

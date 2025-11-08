@@ -4,8 +4,15 @@ from typing import List, Dict, Any, Optional
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MEDICATION_FILE = os.path.join(SCRIPT_DIR, "personal_medication.json")
-
-PALETTE = ["med-blue", "med-green", "med-orange", "med-purple", "med-pink", "med-yellow"]
+USER_DATA_FILE = os.path.join(SCRIPT_DIR, "personal_data.json")
+PALETTE = [
+    "med-blue",
+    "med-green",
+    "med-orange",
+    "med-purple",
+    "med-pink",
+    "med-yellow",
+]
 
 
 def _read_json(filepath: str) -> List[Dict[str, Any]]:

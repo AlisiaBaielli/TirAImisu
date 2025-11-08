@@ -77,12 +77,46 @@ const NotificationWindow = () => {
     toast.info("We’ll remind you again later.");
   };
 
-  const handleOrder = (n: NotificationItem) => {
-    setDismissed((prev) => new Set(prev).add(n.id));
-    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
-    toast.success(`Order placed for${med}.`);
-  };
+// Add a local "ordering" set to track which items are ordering
+const [orderingIds, setOrderingIds] = useState<Set<string>>(new Set());
 
+const handleOrder = async (n: NotificationItem) => {
+  const medName = n?.metadata?.medicationName || n.title || "";
+  if (!medName) {
+    toast.error("Could not determine medication to order.");
+    return;
+  }
+
+  // mark this specific card as ordering
+  setOrderingIds(prev => new Set(prev).add(n.id));
+
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/buy/${encodeURIComponent(medName)}`,
+      { method: "POST" }
+    );
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.detail || `Failed to order (${res.status})`);
+    }
+    const data = await res.json();
+    // Dismiss only on success
+    setDismissed(prev => new Set(prev).add(n.id));
+
+    toast.success(`Order started for ${data?.drug_name || medName}.`);
+    // (Optional) you can surface a summary from data.result if you return one.
+
+  } catch (e: any) {
+    toast.error(e?.message || "Failed to place order.");
+  } finally {
+    // clear the ordering state for this card
+    setOrderingIds(prev => {
+      const next = new Set(prev);
+      next.delete(n.id);
+      return next;
+    });
+  }
+};
   const handleDismiss = (n: NotificationItem) => {
     setDismissed((prev) => new Set(prev).add(n.id));
     toast.info("Reminder dismissed.");
@@ -127,9 +161,16 @@ const NotificationWindow = () => {
               </div>
             ) : n.category === "low_stock" ? (
               <div className="flex gap-2">
-                <Button size="sm" variant="destructive" onClick={() => handleOrder(n)} className="flex-1 h-8 py-1">
-                  Order it
-                </Button>
+               <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => handleOrder(n)}
+              className="flex-1 h-8 py-1"
+              disabled={orderingIds.has(n.id)}
+            >
+              {orderingIds.has(n.id) ? "Ordering…" : "Order it"}
+            </Button>
+
                 <Button size="sm" variant="outline" onClick={() => handleDismiss(n)} className="flex-1 h-8 py-1">
                   Dismiss
                 </Button>
