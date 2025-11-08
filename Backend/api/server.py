@@ -17,6 +17,7 @@ from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
 from Backend.data.utils import add_new_medication, retrieve_medications, ensure_colors
+from Backend.agents.camera_agent.email_doctor import send_email_to_doctor
 
 # import drug interactions tools
 from Backend.drug_interactions.drug_interactions import check_new_medication_against_list, get_drug_side_effects
@@ -394,47 +395,47 @@ def camera_agent_scan(payload: CameraScanRequest):
     )
 
 
-# Drug interactions endpoint unchanged (calls check_new_medication_against_list)
-class DrugInteractionRequest(BaseModel):
-    user_id: str
-    new_medication_name: str
+# ─────────── Send email to doctor endpoint ─────────── #
+class SendEmailRequest(BaseModel):
+    user_id: int = Field(1, ge=1)
+    content: str = Field(..., min_length=1)
 
 
-@app.post("/api/drug-interactions")
-def drug_interactions_check(payload: DrugInteractionRequest):
-    user_id = payload.user_id
-    new_med = payload.new_medication_name
-    if not user_id or not new_med:
-        raise HTTPException(status_code=400, detail="user_id and new_medication_name required")
+class SendEmailResponse(BaseModel):
+    success: bool
+    message_id: Optional[str] = None
+    to: Optional[str] = None
+    from_email: Optional[str] = Field(None, alias="from")
+    subject: Optional[str] = None
+    error: Optional[str] = None
 
-    existing = retrieve_medications(user_id)
-    existing_names: List[str] = []
-    for m in existing:
-        name = (m.get("drug_name") or "").strip()
-        strength = (m.get("strength") or "").strip()
-        if name:
-            existing_names.append(f"{name} {strength}".strip())
 
+@app.post("/api/send-email-to-doctor", response_model=SendEmailResponse)
+def send_email_endpoint(payload: SendEmailRequest):
     try:
-        results = check_new_medication_against_list(existing_names, new_med)
-    except Exception as exc:
-        logger.exception("Drug interactions check failed")
-        raise HTTPException(status_code=500, detail=str(exc))
-
-    out = []
-    for new_d, existing_d, report in results:
-        out.append(
-            {
-                "new_drug": new_d,
-                "existing_drug": existing_d,
-                "interaction_found": bool(getattr(report, "interaction_found", False)),
-                "severity": getattr(report, "severity", None),
-                "description": getattr(report, "description", None),
-                "extended_description": getattr(report, "extended_description", None),
-            }
+        result = send_email_to_doctor(user_id=payload.user_id, content=payload.content)
+        
+        if not result.get("success"):
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=result.get("error", "Failed to send email")
+            )
+        
+        return SendEmailResponse(
+            success=result["success"],
+            message_id=result.get("message_id"),
+            to=result.get("to"),
+            from_email=result.get("from"),
+            subject=result.get("subject"),
         )
-
-    return {"interactions": out}
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed to send email to doctor")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {str(exc)}"
+        )
 
 
 if __name__ == "__main__":
