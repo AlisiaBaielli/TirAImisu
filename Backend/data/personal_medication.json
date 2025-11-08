@@ -31,7 +31,7 @@
         "color": "med-green"
       },
       {
-        "drug_name": "Metformin",
+        "drug_name": "Lisinopril",
         "strength": "500mg",
         "quantity_left": 30,
         "dose_per_intake": 1,

@@ -356,6 +356,7 @@ def refresh_events_calendar_events() -> dict:
 
 
 @app.post("/api/buy")
+@app.post("/api/buy")
 async def buy(data: dict):
     drug_name = data.get("drug_name")
     if not drug_name:
@@ -454,12 +455,12 @@ def drug_interactions_check(payload: DrugInteractionRequest):
     existing_names: List[str] = []
     for m in existing:
         name = (m.get("drug_name") or "").strip()
-        strength = (m.get("strength") or "").strip()
         if name:
-            existing_names.append(f"{name} {strength}".strip())
+            existing_names.append(name)
 
     try:
         results = check_new_medication_against_list(existing_names, new_med)
+        side_effects = get_drug_side_effects(new_med)
     except Exception as exc:
         logger.exception("Failed to send email to doctor")
         raise HTTPException(
@@ -467,7 +468,21 @@ def drug_interactions_check(payload: DrugInteractionRequest):
             detail=f"Unexpected error: {str(exc)}"
         )
 
-# ─────────── Send email to doctor endpoint ─────────── #
+    out = []
+    for new_d, existing_d, report in results:
+        out.append(
+            {
+                "new_drug": new_d,
+                "existing_drug": existing_d,
+                "interaction_found": bool(getattr(report, "interaction_found", False)),
+                "severity": getattr(report, "severity", None),
+                "description": getattr(report, "description", None),
+                "extended_description": getattr(report, "extended_description", None),
+            }
+        )
+
+    return {"interactions": out}
+
 class SendEmailRequest(BaseModel):
     user_id: int = Field(1, ge=1)
     content: str = Field(..., min_length=1)
@@ -502,6 +517,7 @@ def send_email_endpoint(payload: SendEmailRequest):
         )
     except HTTPException:
         raise
+
 
 if __name__ == "__main__":
     import uvicorn

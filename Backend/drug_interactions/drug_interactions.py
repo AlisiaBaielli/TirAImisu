@@ -21,7 +21,10 @@ try:
         raise openai.OpenAIError("OPENAI_API_KEY not found. Make sure it's set in your .env file.")
     
     # The client will now automatically find the key
-    client = openai.OpenAI()
+    client = openai.OpenAI(
+            api_key="sk-r0hwmHPWW8yghQ0_axmBfw",
+        base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1"
+    )
     
 except openai.OpenAIError as e:
     print(f"Error initializing OpenAI client: {e}")
@@ -122,7 +125,7 @@ def check_interaction_with_llm(interaction_text: str, drug_a_name: str, drug_b_n
     ]
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -191,7 +194,7 @@ def synthesize_reports(reports: List[InteractionReport], drug_a: str, drug_b: st
     ]
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}

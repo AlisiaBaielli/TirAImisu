@@ -58,11 +58,11 @@ const ScanMedicationButton = () => {
       window.dispatchEvent(new Event("medications:updated"));
 
       // 2) call drug-interactions API (server will use saved personal_medication.json to compare)
-      const newMedFullName = `${drugName}${strength ? ` ${strength}` : ""}`.trim();
+      const newMedFullName = drugName;
       const res = await fetch(`${base}/api/drug-interactions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, new_medication_name: newMedFullName }),
+        body: JSON.stringify({ user_id: userId, new_medication_name: drugName }),
       });
 
       if (!res.ok) {
