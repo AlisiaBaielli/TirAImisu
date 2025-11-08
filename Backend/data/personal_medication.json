@@ -42,6 +42,19 @@
         "start_date": "2025-11-05"
       },
       {
+        "drug_name": "Zyrtec 10 mg",
+        "strength": "",
+        "quantity_left": 30,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": [
+            "09:00"
+          ]
+        },
+        "start_date": "2025-11-08"
+      },
+      {
         "drug_name": "TestMed",
         "strength": "10mg",
         "quantity_left": 5,
