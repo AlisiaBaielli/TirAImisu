@@ -1,6 +1,7 @@
 [
   {
     "user_id": "1",
+    "age": "30",
     "username": "jan.jansen",
     "full_name": "Jan Jansen",
     "password": "password",
@@ -14,10 +15,11 @@
     "cvv": "123",
     "expiry_date": "12/2027",
     "credit_card_number": "4242424242424242",
-    "gender": "Female"
+    "gender": "Male"
   },
   {
     "user_id": "2",
+    "age": "78",
     "username": "alice.devries",
     "full_name": "Alice de Vries",
     "password": "password",
@@ -31,6 +33,6 @@
     "cvv": "321",
     "expiry_date": "06/2028",
     "credit_card_number": "5555555555554444",
-    "gender": "Male"
+    "gender": "Female"
   }
 ]
