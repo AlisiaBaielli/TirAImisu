@@ -40,6 +40,19 @@
           ]
         },
         "start_date": "2025-11-05"
+      },
+      {
+        "drug_name": "TestMed",
+        "strength": "10mg",
+        "quantity_left": 5,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": [
+            "21:00"
+          ]
+        },
+        "start_date": "2025-11-08"
       }
     ]
   },

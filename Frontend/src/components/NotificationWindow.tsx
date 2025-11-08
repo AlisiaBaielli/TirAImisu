@@ -1,132 +1,139 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
 
-// Increased height for notifications
-const NOTIFICATION_HEIGHT = 260; // px
+// Slightly reduced height for a more compact panel
+const NOTIFICATION_HEIGHT = 190; // px
+
+type NotificationCategory = "reminder" | "low_stock";
+
+type NotificationItem = {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  due_at: string;
+  color: string; // "blue" | "red"
+  metadata?: Record<string, any>;
+};
 
 const NotificationWindow = () => {
   const [show, setShow] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
-  // Question 1 state
-  const [takenAnswered, setTakenAnswered] = useState(false);
+  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
-  // Stock warning state
-  const [stockHandled, setStockHandled] = useState(false);
+  const visibleNotifications = useMemo(
+    () => notifications.filter((n) => !dismissed.has(n.id)),
+    [notifications, dismissed]
+  );
 
-  const aspirinName = "Aspirin 100mg";
-  const lowStockMed = "Paracetamol";
-
-  // Example: Add more notifications here if needed
-  const notifications = [
-    {
-      key: "taken",
-      content: (
-        <div className="rounded-md border border-success/30 bg-success/10 p-3 space-y-2">
-          <p className="text-sm">
-            Have you taken <span className="font-semibold text-success">{aspirinName}</span>?
-          </p>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={() => handleTaken(true)}
-              className="flex-1"
-              disabled={takenAnswered}
-            >
-              Yes
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => handleTaken(false)}
-              className="flex-1"
-              disabled={takenAnswered}
-            >
-              No
-            </Button>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "stock",
-      content: (
-        <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 space-y-2">
-          <p className="text-sm">
-            You will run out of <span className="font-semibold text-destructive">{lowStockMed}</span> in a week.
-          </p>
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={handleOrder}
-              className="flex-1"
-              disabled={stockHandled}
-            >
-              Order it
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleDismissStock}
-              className="flex-1"
-              disabled={stockHandled}
-            >
-              Dismiss
-            </Button>
-          </div>
-        </div>
-      ),
-    },
-    // Add more notification objects here as needed
-  ];
-
-  function handleTaken(taken: boolean) {
-    setTakenAnswered(true);
-    if (taken) {
-      toast.success(`Marked ${aspirinName} as taken.`);
-    } else {
-      toast.info("We’ll remind you again later.");
+  const colorClasses = (n: NotificationItem) => {
+    if (n.category === "low_stock" || n.color === "red") {
+      return "border-destructive/30 bg-destructive/10";
     }
-    maybeHide(true, stockHandled);
-  }
+    return "border-primary/30 bg-primary/10"; // reminder (blue)
+  };
 
-  function handleOrder() {
-    setStockHandled(true);
-    toast.success(`Order placed for ${lowStockMed}.`);
-    maybeHide(takenAnswered, true);
-  }
+  const load = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/notifications`);
+      if (!res.ok) throw new Error(`Failed to load notifications (${res.status})`);
+      const data = await res.json();
+      const items: NotificationItem[] = Array.isArray(data?.notifications) ? data.notifications : [];
+      setNotifications(items);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  function handleDismissStock() {
-    setStockHandled(true);
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 30000); // refresh every 30s
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleReminderYes = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
+    toast.success(`Marked${med} as taken.`);
+  };
+
+  const handleReminderNo = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    toast.info("We’ll remind you again later.");
+  };
+
+  const handleOrder = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
+    toast.success(`Order placed for${med}.`);
+  };
+
+  const handleDismiss = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
     toast.info("Reminder dismissed.");
-    maybeHide(takenAnswered, true);
-  }
-
-  function maybeHide(takenDone: boolean, stockDone: boolean) {
-    if (takenDone && stockDone) setShow(false);
-  }
+  };
 
   if (!show) return null;
 
   return (
     <Card className="border-primary/20 shadow-md">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Bell className="h-4 w-4 text-primary" />
           Notifications
         </CardTitle>
       </CardHeader>
       <CardContent
-        className="space-y-4"
+        className="space-y-2"
         style={{
           maxHeight: NOTIFICATION_HEIGHT,
           overflowY: "auto",
         }}
       >
-        {notifications.map((n) => n.content)}
+        {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
+        {error && !loading && <div className="text-xs text-destructive">{error}</div>}
+        {!loading && !error && visibleNotifications.length === 0 && (
+          <div className="text-xs text-muted-foreground">No notifications</div>
+        )}
+        {visibleNotifications.map((n) => (
+          <div key={n.id} className={`rounded-md border p-2 space-y-1 ${colorClasses(n)}`}>
+            <p className="text-xs">
+              <span className="font-medium">{n.title}</span>
+            </p>
+            <p className="text-[11px] text-muted-foreground">{n.message}</p>
+            {n.category === "reminder" ? (
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => handleReminderYes(n)} className="flex-1 h-8 py-1">
+                  Yes
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleReminderNo(n)} className="flex-1 h-8 py-1">
+                  No
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button size="sm" variant="destructive" onClick={() => handleOrder(n)} className="flex-1 h-8 py-1">
+                  Order it
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleDismiss(n)} className="flex-1 h-8 py-1">
+                  Dismiss
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
       </CardContent>
     </Card>
   );
