@@ -84,8 +84,7 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
       try {
         await fetch(`${base}/api/events-calendar/events/refresh`, { method: "POST" });
       } catch {}
-      onConfirm(manualEntry);
-    } catch (e: any) {
+      onConfirm(manualEntry);   } catch (e: any) {
       toast.error(e?.message ?? "Failed to add medication");
     }
   };

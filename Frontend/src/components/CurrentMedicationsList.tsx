@@ -24,7 +24,6 @@ function ensureUniqueColors(items: Medication[]): Medication[] {
   const used = new Set<string>();
   return items.map((m) => {
     const base = typeof m.color === "string" && m.color ? m.color : PALETTE[hashString(m.name) % PALETTE.length];
-    // If already used, pick the next available in palette
     let color = base;
     if (used.has(color)) {
       const start = PALETTE.indexOf(base as any);
@@ -40,6 +39,11 @@ function ensureUniqueColors(items: Medication[]): Medication[] {
     return { ...m, color };
   });
 }
+
+const VISIBLE_ROWS = 3;
+const ROW_HEIGHT = 56; // px per row (approx)
+const GAP = 8;         // px for space-y-2
+const LIST_HEIGHT = VISIBLE_ROWS * ROW_HEIGHT + (VISIBLE_ROWS - 1) * GAP; // exact 3 rows visible
 
 const CurrentMedicationsList = () => {
   const [medications, setMedications] = useState<Medication[]>([]);
@@ -82,17 +86,21 @@ const CurrentMedicationsList = () => {
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">Current Medications</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-0">
         {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
         {error && !loading && <p className="text-sm text-destructive">{error}</p>}
         {!loading && !error && coloredMeds.length === 0 ? (
           <p className="text-sm text-muted-foreground">No medications added yet</p>
         ) : (
-          <div className="space-y-2">
+          <div
+            className="space-y-2 overflow-y-auto custom-scrollbar"
+            style={{ height: LIST_HEIGHT }}
+          >
             {coloredMeds.map((med) => (
               <div
                 key={med.id}
-                className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-all hover-scale cursor-pointer animate-scale-in"
+                className="flex items-center gap-3 p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-all hover-scale cursor-pointer"
+                style={{ height: ROW_HEIGHT - 8 }} // adjust for padding to keep 56px row total
               >
                 <div
                   className="p-1.5 rounded-md"
