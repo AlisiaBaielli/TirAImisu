@@ -39,4 +39,4 @@ opencv-python
 dotenv
 fastapi
 rich
-browser-use
+browser-use==0.9.5

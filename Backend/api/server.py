@@ -22,7 +22,7 @@ from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
 from Backend.data.utils import add_new_medication, retrieve_medications, ensure_colors
-from Backend.agents.camera_agent.email_doctor import send_email_to_doctor
+from Backend.agents.email_agent.email_doctor import send_email_to_doctor
 
 # import drug interactions tools
 from Backend.drug_interactions.drug_interactions import (
