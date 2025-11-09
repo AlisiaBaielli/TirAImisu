@@ -28,9 +28,9 @@ cd Backend
 pip install -r requirements
 cd ..
 python -m Backend.api.server
-
-To start the frontend run in another terminal:
 ```
+To start the frontend run in another terminal:
+
 ```
 cd Frontend
 npm install
