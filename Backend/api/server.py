@@ -45,6 +45,8 @@ allowed_origins = [
     "http://127.0.0.1:5173",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
 ]
 cors_extra = os.getenv("CORS_EXTRA_ORIGINS")
 if cors_extra:
@@ -69,6 +71,14 @@ def _load_json(name: str) -> Any:
         return json.loads(p.read_text())
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Invalid JSON in {name}: {exc}")
+
+
+def _save_json(name: str, data: Any) -> None:
+    p = DATA_DIR / name
+    try:
+        p.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to save {name}: {exc}")
 
 
 def _format_frequency(schedule: Dict[str, Any]) -> str:
@@ -103,17 +113,43 @@ class LoginRequest(BaseModel):
 @app.post("/api/auth/login")
 def login(payload: LoginRequest):
     users = _load_json("personal_data.json")
+    
+    # Check if user exists
     user = next(
-        (
-            u
-            for u in users
-            if u.get("username") == payload.username
-            and u.get("password") == payload.password
-        ),
+        (u for u in users if u.get("username") == payload.username),
         None,
     )
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if user:
+        # Existing user: validate password
+        if user.get("password") != payload.password:
+            raise HTTPException(status_code=401, detail="Invalid credentials")
+    else:
+        # New user: auto-create with next user_id
+        existing_ids = [int(u.get("user_id", 0)) for u in users if u.get("user_id")]
+        next_id = max(existing_ids) + 1 if existing_ids else 1
+        
+        user = {
+            "user_id": str(next_id),
+            "username": payload.username,
+            "password": payload.password,
+            "full_name": "",
+            "email": "",
+            "age": "",
+            "street": "",
+            "house_number": "",
+            "city": "",
+            "post_code": "",
+            "phone_number": "",
+            "doctor_email": "",
+            "cvv": "",
+            "expiry_date": "",
+            "credit_card_number": "",
+            "gender": ""
+        }
+        users.append(user)
+        _save_json("personal_data.json", users)
+    
     sanitized = {k: v for k, v in user.items() if k != "password"}
     return {"user_id": user["user_id"], "user": sanitized}
 
@@ -124,6 +160,42 @@ def get_user(user_id: str):
     user = next((u for u in users if u.get("user_id") == user_id), None)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    sanitized = {k: v for k, v in user.items() if k != "password"}
+    return {"user": sanitized}
+
+
+@app.put("/api/users/{user_id}")
+def update_user(user_id: str, payload: Dict[str, Any]):
+    """Update user data in personal_data.json"""
+    users = _load_json("personal_data.json")
+    user_index = None
+    for i, u in enumerate(users):
+        if u.get("user_id") == user_id:
+            user_index = i
+            break
+    
+    if user_index is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Update fields (preserve password and user_id)
+    user = users[user_index]
+    updatable_fields = [
+        "full_name", "age", "gender", "email", "street", "house_number",
+        "city", "post_code", "phone_number", "doctor_email",
+        "credit_card_number", "expiry_date", "cvv"
+    ]
+    
+    for field in updatable_fields:
+        if field in payload:
+            user[field] = payload[field]
+    
+    # Handle "address" mapping to "street"
+    if "address" in payload:
+        user["street"] = payload["address"]
+    
+    users[user_index] = user
+    _save_json("personal_data.json", users)
+    
     sanitized = {k: v for k, v in user.items() if k != "password"}
     return {"user": sanitized}
 
