@@ -6,7 +6,6 @@ services:
     image: pillpal-api:latest
     ports:
       - "8000:8000"
-    network_mode: "host"
     env_file:
       - .env
     # Optional persistent cache for Playwright (faster cold start)
