@@ -60,7 +60,8 @@ const WeekCalendar = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
 
-  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+    const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    const baseUrl = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
 
   // Load non-user extra events
   const fetchExtraEvents = async () => {
