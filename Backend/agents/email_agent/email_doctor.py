@@ -35,7 +35,7 @@ def generate_doctor_email(content: str) -> str:
     base = os.getenv("OPENAI_BASE_URL") or "https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1"
     client = openai.OpenAI(api_key=key, base_url=base)
 
-    model = "gpt-5"
+    model = "gpt-5-nano"
     system_msg = {
         "role": "system",
         "content": "Generate a professional medical email in JSON format. Be concise and formal.",
@@ -120,110 +120,85 @@ def generate_doctor_email(content: str) -> str:
     return {"subject": gen.subject, "email": gen.email}
 
 
-def send_email_to_doctor(user_id: int, content: str) -> Dict[str]:
-    """Send an email to the doctor using Resend API.
-    
-    This function:
-    1. Loads user data from personal_data.json based on user_id
-    2. Generates email content using generate_doctor_email()
-    3. Sends the email using Resend API
-    
-    Parameters:
-        user_id: The user ID to look up in personal_data.json (default: 1)
-        content: The drug interaction information to include in the email
-    
-    Returns:
-        Dict with 'success' (bool), 'message_id' (str if successful), 'error' (str if failed)
-    
-    Environment Variables Required:
-        RESEND_API_KEY: Your Resend API key
+def send_email_to_doctor(user_id: int, content: str) -> Dict[str, Any]:
     """
-    # Load personal data
-    data_path = Path(__file__).parent.parent.parent / "data" / "personal_data.json"
-    
+    1. Loads user (and doctor) info from personal_data.json
+    2. Generates email text
+    3. Sends via Resend API (RESEND_API_KEY required)
+    Returns dict with success / message_id / to / from / subject or error.
+    """
+    data_path = Path(__file__).resolve().parent.parent.parent / "data" / "personal_data.json"
     try:
-        with open(data_path, 'r') as f:
+        with open(data_path, "r") as f:
             users = json.load(f)
     except FileNotFoundError:
         return {"success": False, "error": f"personal_data.json not found at {data_path}"}
     except json.JSONDecodeError as e:
         return {"success": False, "error": f"Invalid JSON in personal_data.json: {e}"}
-    
-    # Find the user
-    user = None
-    for u in users:
-        if str(u.get("user_id")) == str(user_id):
-            user = u
-            break
-    
+
+    user = next((u for u in users if str(u.get("user_id")) == str(user_id)), None)
     if not user:
         return {"success": False, "error": f"User with user_id={user_id} not found"}
     
+    # Find the user
     user_email = user.get("email")
     doctor_email = user.get("doctor_email")
-    user_name = user.get("full_name")
-    
+    user_name = user.get("full_name") or "Patient"
+
     if not user_email or not doctor_email:
-        return {"success": False, "error": "Missing email or doctor_email in user data"}
-    
-    # Generate email content
+        return {"success": False, "error": "Missing user email or doctor_email"}
+
+    # Generate email body
     try:
         email_data = generate_doctor_email(content)
-        subject = email_data.get("subject", "Drug Interaction Inquiry")
-        email_body = email_data.get("email", "")
-        
-        # Add signature
-        if user_name and user_name.lower() not in email_body.lower():
-            email_body += f"\n\nBest regards,\n{user_name}"
-            
+        subject = email_data.get("subject") or "Drug Interaction Inquiry"
+        body = email_data.get("email") or ""
+        # Append signature if not already
+        if user_name.lower() not in body.lower():
+            body += f"\n\nBest regards,\n{user_name}"
     except Exception as e:
         return {"success": False, "error": f"Failed to generate email: {e}"}
-    
-    # Send email using Resend API
-    api_key = os.getenv("RESEND_API_KEY") or "re_cuZbaUn5_H8iRKUnzXVeAPPafmxjEQq5z"
+
+    api_key = os.getenv("RESEND_API_KEY", "").strip()
     if not api_key:
-        return {"success": False, "error": "RESEND_API_KEY not set in environment"}
-    
+        return {"success": False, "error": "RESEND_API_KEY not set"}
+
     url = "https://api.resend.com/emails"
     headers = {
         "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
-    
+
+    # Dynamic (non-hardcoded) doctor + reply_to
     payload = {
-        "from": f"{user_name} <onboarding@resend.dev>",  # Resend's default sender for testing
-        #"to": [doctor_email],
-        "to": ["devpereira1@gmail.com"],
-        #"reply_to": user_email,
-        "reply_to": "devpereira1@gmail.com",
+        "from": f"{user_name} <onboarding@resend.dev>",
+        "to": [doctor_email],
+        "reply_to": user_email,
         "subject": subject,
-        "text": email_body,
+        "text": body,
     }
     
     try:
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        result = response.json()
+        r = requests.post(url, headers=headers, json=payload, timeout=15)
+        r.raise_for_status()
+        resp_json = r.json()
         return {
             "success": True,
-            "message_id": result.get("id"),
-            #"to": doctor_email,
-            "to": ["devpereira1@gmail.com"],
+            "message_id": resp_json.get("id"),
+            "to": [doctor_email],
             "from": user_email,
-            "subject": subject
+            "subject": subject,
         }
     except requests.exceptions.RequestException as e:
-        error_msg = str(e)
-        if hasattr(e, 'response') and e.response is not None:
+        detail = ""
+        if getattr(e, "response", None) is not None:
             try:
-                error_detail = e.response.json()
-                error_msg = f"{error_msg} - {error_detail}"
+                detail = f" - {e.response.json()}"
             except Exception:
-                error_msg = f"{error_msg} - {e.response.text}"
-        return {"success": False, "error": f"Failed to send email: {error_msg}"}
+                detail = f" - {e.response.text}"
+        return {"success": False, "error": f"Failed to send email: {e}{detail}"}
 
 
 if __name__ == "__main__":
-    sample = '''Zyrtec and Xanax are conflicting because they may cause excessive drowsiness. From Devin Pereira''' 
-    result = send_email_to_doctor(user_id=1, content=sample)
-    print(result)
+    demo = "Potential interaction between Lisinopril and Ibuprofen. Please advise."
+    print(send_email_to_doctor(user_id=1, content=demo))
