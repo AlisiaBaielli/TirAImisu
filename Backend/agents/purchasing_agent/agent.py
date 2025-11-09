@@ -4,7 +4,7 @@ from browser_use import Agent, Browser, ChatBrowserUse
 
 from Backend.data.utils import retrieve_medications, _read_json, USER_DATA_FILE
 
-dotenv.load_dotenv()
+# dotenv.load_dotenv()
 
 STORE = {
     "base_url": "https://www.drogist.nl/",

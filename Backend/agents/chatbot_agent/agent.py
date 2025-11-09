@@ -18,7 +18,7 @@ from Backend.agents.chatbot_agent.tools import (
 )  # get_current_meds, check_interaction
 import dotenv
 
-dotenv.load_dotenv()
+# dotenv.load_dotenv()
 
 
 SYSTEM_PROMPT = SystemMessage(

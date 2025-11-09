@@ -436,13 +436,14 @@ def _build_llm_client() -> Optional[openai.OpenAI]:
       - Uses OPENAI_BASE_URL if provided (proxy), else defaults
     """
     try:
-        key = os.getenv("OPENAI_API_KEY")
+        key = 'sk-r0hwmHPWW8yghQ0_axmBfw'
         if not key:
-            logger.info("Skipping LLM advice: OPENAI_API_KEY not set")
-            return None
-        base_url = os.getenv("OPENAI_BASE_URL")
-        client = openai.OpenAI(api_key=key, base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")# if base_url else openai.OpenAI(api_key=key)
-        logger.info("LLM advice: client initialized (base_url=%s)", base_url or "default")
+            raise RuntimeError("No API key provided. Set OPENAI_API_KEY env var.")
+
+        client = openai.OpenAI(
+            api_key=key,
+            base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1",
+        )
         return client
     except Exception as exc:
         logger.info("Skipping LLM advice: failed to init client: %s", exc)
@@ -466,8 +467,7 @@ def _llm_personalized_event_advice(
             event_start.isoformat(),
             ", ".join(medications) if medications else "none",
         )
-        # client = _build_llm_client()
-        client = openai.OpenAI(api_key='sk-r0hwmHPWW8yghQ0_axmBfw', base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
+        client = _build_llm_client()
         if client is None:
             logger.info("LLM advice: client not available (missing key or init failed)")
             return ""
@@ -493,9 +493,8 @@ def _llm_personalized_event_advice(
             "Return only the advice sentence. Say if there is no interaction"
         )
 
-        # model = os.getenv("OPENAI_MODEL", "gpt-5-nano")
-        model = "gpt-5"
-        logger.info("LLM advice: calling model=%s base_url=%s", model, "https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1")
+        model = os.getenv("OPENAI_MODEL") or os.getenv("LLM_MODEL") or "gpt-5-nano"
+        logger.info("LLM advice: calling model=%s base_url=%s", model, os.getenv("OPENAI_BASE_URL") or "default")
         # Prefer plain string messages for maximum compatibility
         messages = [
             {"role": "system", "content": system_prompt},
