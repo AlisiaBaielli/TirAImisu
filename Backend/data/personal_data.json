@@ -11,7 +11,7 @@
     "city": "Amsterdam",
     "post_code": "1082MA",
     "phone_number": "0612345678",
-    "doctor_email": "devpereira1@gmail.com",
+    "doctor_email": "pranavsrv10@gmail.com",
     "cvv": "123",
     "expiry_date": "12/2027",
     "credit_card_number": "4242424242424242",
@@ -29,10 +29,28 @@
     "city": "Amsterdam",
     "post_code": "1016AB",
     "phone_number": "0687654321",
-    "doctor_email": "alisiabaielli@gmail.com",
+    "doctor_email": "pranavsrv10@gmail.com",
     "cvv": "321",
     "expiry_date": "06/2028",
     "credit_card_number": "5555555555554444",
     "gender": "Female"
+  },
+  {
+    "user_id": "3",
+    "username": "abc",
+    "password": "def",
+    "full_name": "",
+    "email": "",
+    "age": "",
+    "street": "",
+    "house_number": "",
+    "city": "",
+    "post_code": "",
+    "phone_number": "",
+    "doctor_email": "",
+    "cvv": "",
+    "expiry_date": "",
+    "credit_card_number": "",
+    "gender": ""
   }
 ]

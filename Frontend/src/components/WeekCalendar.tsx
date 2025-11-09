@@ -173,6 +173,20 @@ const WeekCalendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Force refresh backend cache then reload
+  const refreshAll = async () => {
+    try {
+      setLoading(true);
+      setLoadingMeds(true);
+      setError(null);
+      // Force backend to refresh cached external events
+      await fetch(`${baseUrl}/api/events-calendar/events/refresh`, { method: "POST" }).catch(() => {});
+    } finally {
+      // Reload both sources regardless of refresh result
+      await Promise.all([fetchExtraEvents(), fetchMedications()]);
+    }
+  };
+
   // Colors map
   const medColorMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -222,10 +236,7 @@ const WeekCalendar = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              fetchExtraEvents();
-              fetchMedications();
-            }}
+            onClick={refreshAll}
             disabled={loading || loadingMeds}
           >
             {loading || loadingMeds ? "Refreshing..." : "Refresh"}

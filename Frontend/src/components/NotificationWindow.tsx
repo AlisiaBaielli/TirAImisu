@@ -1,240 +1,133 @@
-import { useState, useRef } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { useEffect, useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Camera, Loader2 } from "lucide-react";
+import { Bell } from "lucide-react";
 import { toast } from "sonner";
 
+type NotificationCategory = "reminder" | "low_stock" | "event_soon";
 
-export interface NewMedicationPayload {
-  name: string;
-  dosage: string;
-  numberOfPills: string;
-  startDate: string;
-  endDate: string;
-  frequency: string;
-  time: string;
-}
+type NotificationItem = {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  message: string;
+  due_at: string;
+  color: string;
+  metadata?: Record<string, any>;
+};
 
-interface ScanMedicationDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: (data: NewMedicationPayload) => void;
-}
+const NOTIFICATION_HEIGHT = 190;
 
-const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationDialogProps) => {
-  const [manualEntry, setManualEntry] = useState<NewMedicationPayload>({
-    name: "",
-    dosage: "",
-    numberOfPills: "",
-    startDate: "",
-    endDate: "",
-    frequency: "",
-    time: "",
-  });
+const NotificationWindow = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
-  // Camera state
-  const [cameraActive, setCameraActive] = useState(false);
-  const [photo, setPhoto] = useState<string | null>(null);
-  const [scanning, setScanning] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const visible = useMemo(
+    () => notifications.filter((n) => !dismissed.has(n.id)),
+    [notifications, dismissed]
+  );
 
-  const handleCameraClick = async () => {
-    setCameraActive(true);
-    setPhoto(null);
+  const colorClasses = (n: NotificationItem) => {
+    if (n.category === "low_stock" || n.color === "red") return "border-destructive/30 bg-destructive/10";
+    if (n.category === "event_soon" || n.color === "brown") return "border-amber-600/30 bg-amber-600/10";
+    return "border-primary/30 bg-primary/10";
+  };
+
+  const load = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-    } catch {
-      toast.error("Could not access camera");
-      setCameraActive(false);
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`${baseUrl}/api/notifications`);
+      if (!res.ok) throw new Error(`Failed to load notifications (${res.status})`);
+      const data = await res.json();
+      const items: NotificationItem[] = Array.isArray(data?.notifications) ? data.notifications : [];
+      setNotifications(items);
+    } catch (e: any) {
+      setError(e?.message ?? "Failed to load notifications");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleTakePhoto = async () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/png");
-      setPhoto(dataUrl);
-      const stream = video.srcObject as MediaStream;
-      stream?.getTracks().forEach((track) => track.stop());
-      setCameraActive(false);
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 30000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      setScanning(true);
-      try {
-        const base64 = dataUrl.split(",")[1];
-        const userId = localStorage.getItem("userId") || "1";
-        const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-        const res = await fetch(`${base}/api/camera-agent/scan`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId, image_b64: base64 }),
-        });
-        if (!res.ok) throw new Error("Failed to scan medication image");
-        const result = await res.json();
-        setManualEntry((prev) => ({
-          ...prev,
-          name: result.medication_name ?? "",
-          dosage: result.dosage ?? "",
-          numberOfPills: result.num_pills ? String(result.num_pills) : "",
-        }));
-        toast.success("Medication scanned!");
-      } catch (e: any) {
-        toast.error(e?.message ?? "Scan failed");
-      } finally {
-        setScanning(false);
-      }
-    }
+  const handleReminderYes = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
+    toast.success(`Marked${med} as taken.`);
   };
 
-  const handleCancelCamera = () => {
-    setCameraActive(false);
-    setPhoto(null);
-    if (videoRef.current) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream?.getTracks().forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-    }
+  const handleReminderNo = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    toast.info("We’ll remind you again later.");
   };
 
-  const handleConfirm = () => {
-    if (!manualEntry.name || !manualEntry.dosage) {
-      toast.error("Please enter medication name and dosage");
-      return;
-    }
-    // Do not call backend here — ScanMedicationButton will persist + run interaction checks.
-    onConfirm(manualEntry);
+  const handleOrder = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
+    toast.success(`Order placed for${med}.`);
+  };
+
+  const handleDismiss = (n: NotificationItem) => {
+    setDismissed((prev) => new Set(prev).add(n.id));
+    toast.info("Reminder dismissed.");
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md animate-scale-in" style={{ position: "relative" }}>
-        <DialogHeader>
-          <DialogTitle>Add Medication</DialogTitle>
-          <DialogDescription>Take a photo or enter medication details manually</DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6 py-4">
-          {/* Camera / Photo area */}
-          <div className="flex flex-col items-center relative">
-            {!cameraActive && !photo && !scanning && (
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-32 w-32 rounded-full"
-                onClick={handleCameraClick}
-                disabled={scanning}
-              >
-                <Camera className="h-12 w-12" />
-              </Button>
-            )}
-
-            {cameraActive && (
-              <div className="flex flex-col items-center gap-2 relative">
-                <video ref={videoRef} className="rounded-lg border" style={{ width: 220, height: 160 }} />
-                <div className="flex gap-2 mt-2">
-                  <Button size="sm" onClick={handleTakePhoto} disabled={scanning}>
-                    {scanning ? "Scanning..." : "Take Photo"}
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={handleCancelCamera} disabled={scanning}>
-                    Cancel
-                  </Button>
-                </div>
-                <canvas ref={canvasRef} style={{ display: "none" }} />
-              </div>
-            )}
-
-            {photo && (
-              <div className="flex flex-col items-center gap-2 relative">
-                <img src={photo} alt="Medication" className="rounded-lg border w-32 h-32 object-cover" />
-                <Button size="sm" variant="outline" onClick={() => setPhoto(null)} disabled={scanning}>
-                  Retake
+    <Card className="border-primary/20 shadow-md">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium flex items-center gap-2">
+          <Bell className="h-4 w-4 text-primary" />
+          Notifications <span className="text-xs text-muted-foreground">({visible.length})</span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent
+        className="space-y-2"
+        style={{ maxHeight: NOTIFICATION_HEIGHT, overflowY: "auto" }}
+      >
+        {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
+        {error && !loading && <div className="text-xs text-destructive">{error}</div>}
+        {!loading && !error && visible.length === 0 && (
+          <div className="text-xs text-muted-foreground">No notifications</div>
+        )}
+        {visible.map((n) => (
+          <div key={n.id} className={`rounded-md border p-2 space-y-1 ${colorClasses(n)}`}>
+            <p className="text-xs">
+              <span className="font-medium">{n.title}</span>
+            </p>
+            <p className="text-[11px] text-muted-foreground">{n.message}</p>
+            {n.category === "reminder" ? (
+              <div className="flex gap-2">
+                <Button size="sm" onClick={() => handleReminderYes(n)} className="flex-1 h-8 py-1">
+                  Yes
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleReminderNo(n)} className="flex-1 h-8 py-1">
+                  No
                 </Button>
               </div>
-            )}
-
-            {scanning && (
-              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-lg z-50">
-                <Loader2 className="h-10 w-10 animate-spin text-white mb-2" />
-                <span className="text-white text-lg font-semibold">Processing medication…</span>
-                <span className="text-white text-xs mt-1">Please wait while we analyze your image.</span>
+            ) : n.category === "low_stock" ? (
+              <div className="flex gap-2">
+                <Button size="sm" variant="destructive" onClick={() => handleOrder(n)} className="flex-1 h-8 py-1">
+                  Order it
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleDismiss(n)} className="flex-1 h-8 py-1">
+                  Dismiss
+                </Button>
               </div>
-            )}
+            ) : null}
           </div>
-
-          {/* Manual Entry */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-sm">Manual Entry</h3>
-            <div className="space-y-2">
-              <Label htmlFor="name">Medication Name</Label>
-              <Input id="name" value={manualEntry.name} onChange={(e) => setManualEntry({ ...manualEntry, name: e.target.value })} placeholder="e.g., Aspirin" disabled={scanning} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="dosage">Dosage</Label>
-              <Input id="dosage" value={manualEntry.dosage} onChange={(e) => setManualEntry({ ...manualEntry, dosage: e.target.value })} placeholder="e.g., 100mg" disabled={scanning} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="pills">Number of Pills</Label>
-              <Input id="pills" type="number" value={manualEntry.numberOfPills} onChange={(e) => setManualEntry({ ...manualEntry, numberOfPills: e.target.value })} placeholder="1" disabled={scanning} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
-                <Input id="startDate" type="date" value={manualEntry.startDate} onChange={(e) => setManualEntry({ ...manualEntry, startDate: e.target.value })} disabled={scanning} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="endDate">End Date (Optional)</Label>
-                <Input id="endDate" type="date" value={manualEntry.endDate} onChange={(e) => setManualEntry({ ...manualEntry, endDate: e.target.value })} disabled={scanning} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="frequency">Frequency</Label>
-                <Select value={manualEntry.frequency} onValueChange={(value) => setManualEntry({ ...manualEntry, frequency: value })} disabled={scanning}>
-                  <SelectTrigger id="frequency">
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Every Day</SelectItem>
-                    <SelectItem value="weekly">Weekly</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="time">Time</Label>
-                <Input id="time" type="time" value={manualEntry.time} onChange={(e) => setManualEntry({ ...manualEntry, time: e.target.value })} disabled={scanning} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button onClick={handleConfirm} className="w-full" disabled={scanning}>
-            {scanning ? "Processing..." : "Confirm"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        ))}
+      </CardContent>
+    </Card>
   );
 };
 
-export default ScanMedicationDialog;
+export default NotificationWindow;
