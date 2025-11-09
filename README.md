@@ -9,7 +9,7 @@ PillPal is a lightweight multi-agent medication-assistant prototype. It uses 3 d
 
 ## Instructions
 
-1. Navigate to https://www.website.com
+1. Navigate to [https://www.website.com](http://199.247.26.114/)
    
 2. For demonstration purposes, login with username: jan.jansen - password: password. This profile already has medication loaded which will be useful for our demo. You could also create your own username - passsword combination but the profile will be empty by default. 
 
