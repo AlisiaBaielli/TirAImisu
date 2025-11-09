@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell } from "lucide-react";
+import { Bell, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 type NotificationCategory = "reminder" | "low_stock" | "event_soon";
@@ -140,10 +140,29 @@ const NotificationWindow = () => {
               </div>
             ) : n.category === "low_stock" ? (
               <div className="flex gap-2">
-                <Button size="sm" variant="destructive" onClick={() => handleOrder(n)} className="flex-1 h-8 py-1">
-                  Order it
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleOrder(n)}
+                  className="flex-1 h-8 py-1"
+                  disabled={orderingIds.has(n.id)}
+                >
+                  {orderingIds.has(n.id) ? (
+                    <span className="inline-flex items-center justify-center w-full">
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Ordering…
+                    </span>
+                  ) : (
+                    "Order it"
+                  )}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => handleDismiss(n)} className="flex-1 h-8 py-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleDismiss(n)}
+                  className="flex-1 h-8 py-1"
+                  disabled={orderingIds.has(n.id)}
+                >
                   Dismiss
                 </Button>
               </div>
