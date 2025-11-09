@@ -117,7 +117,7 @@ def extract_medication_data_from_image(
     Returns a dict: {"medication_name": str|None, "dosage": str|None, "num_pills": int|None}
     """
 
-    key = os.getenv("OPENAI_API_KEY")
+    key = 'sk-r0hwmHPWW8yghQ0_axmBfw'
     if not key:
         raise RuntimeError("No API key provided. Set OPENAI_API_KEY env var.")
 

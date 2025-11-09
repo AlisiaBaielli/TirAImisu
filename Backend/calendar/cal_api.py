@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 
 # Load variables from a local .env file if present
-load_dotenv()
+# load_dotenv()
 
 API_TOKEN = os.getenv("CAL_API_TOKEN")
 BASE_URL = os.getenv("CAL_API_BASE_URL")

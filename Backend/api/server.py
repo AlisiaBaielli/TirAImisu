@@ -31,6 +31,9 @@ from Backend.drug_interactions.drug_interactions import (
 )
 
 from Backend.agents.chatbot_agent.agent import ChatAgent
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="PillPal API", version="1.0.0")
 logger = logging.getLogger("api")

@@ -13,20 +13,17 @@ class InteractionReport(BaseModel):
     description: Optional[str] = Field(None, description="A concise, one-sentence summary of the interaction if found.")
     extended_description: Optional[str] = Field(None, description="A detailed explanation of the interaction's mechanism, effects, and management if found.")
 
-load_dotenv() 
 # Initialize OpenAI client lazily and safely (do not exit the host process)
 client: Optional[openai.OpenAI] = None
 try:
-    api_key = os.environ.get("OPENAI_API_KEY")
-    base_url = os.environ.get("OPENAI_BASE_URL")
-    
-    if api_key:
-        if base_url:
-            client = openai.OpenAI(api_key=api_key, base_url=base_url)
-        else:
-            client = openai.OpenAI(api_key=api_key)
-    else:
-        print("Warning: OPENAI_API_KEY not found. LLM interaction checks will be skipped.")
+    key = 'sk-r0hwmHPWW8yghQ0_axmBfw'
+    if not key:
+        raise RuntimeError("No API key provided. Set OPENAI_API_KEY env var.")
+
+    client = openai.OpenAI(
+        api_key=key,
+        base_url="https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1",
+    )
 except Exception as e:
     print(f"Error initializing OpenAI client: {e}")
     client = None
