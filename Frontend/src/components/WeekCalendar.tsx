@@ -41,6 +41,7 @@ interface CalendarChip {
   startMinutes?: number;
   col?: number;
   cols?: number;
+  external?: boolean;
 }
 
 const DEFAULT_EVENT_DURATION_MIN = 30;
@@ -299,6 +300,7 @@ const WeekCalendar = () => {
                           ev.color ||
                           medColorMap[ev.title ?? ""] ||
                           "med-blue";
+                        const isExternal = ev.source !== "medication";
                         const durationMs = end.getTime() - start.getTime();
                         const durationMinutes = Math.max(
                           DEFAULT_EVENT_DURATION_MIN,
@@ -314,6 +316,7 @@ const WeekCalendar = () => {
                           startDate: format(start, "yyyy-MM-dd"),
                           duration: durationMinutes,
                           startMinutes,
+                          external: isExternal,
                         } as CalendarChip;
                       });
 
@@ -348,11 +351,13 @@ const WeekCalendar = () => {
                                 overflow: "hidden",
                                 left: `${leftPercent}%`,
                                 width: `${widthPercent}%`,
-                                backgroundColor: `hsl(var(--${event.color}))`,
+                                backgroundColor: event.external
+                                ? `hsl(var(--muted-foreground))`
+                                : `hsl(var(--${event.color}))`,
                               }}
                               onClick={() => setSelectedMed(event)}
                             >
-                              <div className="truncate leading-tight">
+                              <div className="leading-tight break-words whitespace-normal">
                                 {event.name}
                               </div>
                               {event.duration! >= 60 && (
