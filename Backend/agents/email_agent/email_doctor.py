@@ -26,16 +26,19 @@ def generate_doctor_email(content: str) -> str:
     Returns a dict: {"subject": str, "email": str}
     """
 
-    key = os.getenv("OPENAI_API_KEY") or "sk-r0hwmHPWW8yghQ0_axmBfw"
+    key = os.getenv("OPENAI_API_KEY")
     if not key:
         raise RuntimeError(
             "No API key provided. Set OPENAI_API_KEY in the environment or copy .env.example to .env and set your key there."
         )
 
-    base = os.getenv("OPENAI_BASE_URL") or "https://fj7qg3jbr3.execute-api.eu-west-1.amazonaws.com/v1"
-    client = openai.OpenAI(api_key=key, base_url=base)
+    # base = os.getenv("OPENAI_BASE_URL")
+    # client = openai.OpenAI(api_key=key, base_url=base)
 
-    model = "gpt-5-nano"
+    # model = "gpt-5-nano"
+
+    client = openai.OpenAI(api_key=key) # NO base_url !!
+    model = "gpt-4o-mini"
     system_msg = {
         "role": "system",
         "content": "Generate a professional medical email in JSON format. Be concise and formal.",
