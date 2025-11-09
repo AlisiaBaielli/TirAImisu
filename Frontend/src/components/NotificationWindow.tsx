@@ -23,7 +23,7 @@ const NotificationWindow = () => {
   const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
-  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+  const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
 
   const visible = useMemo(
     () => notifications.filter((n) => !dismissed.has(n.id)),

@@ -17,7 +17,7 @@ const ScanMedicationButton = () => {
   // Top-center floating loading
   const [checking, setChecking] = useState(false);
 
-  const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+  const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
 
   const handleScanConfirm = async (data: NewMedicationPayload) => {
     setScanOpen(false);

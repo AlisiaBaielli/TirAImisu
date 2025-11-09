@@ -20,7 +20,7 @@ const CurrentMedicationsList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+  const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
 
   const load = useCallback(async () => {
     try {
