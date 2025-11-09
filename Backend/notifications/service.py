@@ -240,7 +240,7 @@ def _build_event_soon_notifications(now: datetime) -> List[Notification]:
     """
     Create notifications when:
       - there is any medication scheduled today (past or future), AND
-      - there is a calendar event on the same day starting within <= 3 hours from now.
+      - there is a calendar event on the same day starting within <= 8 hours from now.
     One notification per qualifying calendar event.
     """
     logger.debug("Building event-soon notifications at now=%s", now.isoformat())
@@ -263,7 +263,7 @@ def _build_event_soon_notifications(now: datetime) -> List[Notification]:
     if not events:
         logger.info("No external calendar events available; skipping event-soon notifications")
         return []
-    window_event_end = now + timedelta(hours=3)
+    window_event_end = now + timedelta(hours=8)
     results: List[Notification] = []
     for ev in events:
         start_dt = _to_local_naive(_parse_iso((ev.get("start") or {}).get("date_time")))

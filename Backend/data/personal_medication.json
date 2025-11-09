@@ -10,7 +10,7 @@
         "schedule": {
           "type": "daily",
           "times": [
-            "08:00"
+            "13:00"
           ]
         },
         "start_date": "2025-11-03",
@@ -18,17 +18,32 @@
       },
       {
         "drug_name": "Lisinopril",
-        "strength": "500mg",
-        "quantity_left": 30,
+        "strength": "200mg",
+        "quantity_left": 5,
         "dose_per_intake": 1,
         "schedule": {
           "type": "weekly",
           "times": [
-            "18:00"
+            "15:00"
           ]
         },
         "start_date": "2025-11-05",
         "color": "med-orange"
+      },
+      {
+        "drug_name": "Ibuprofen",
+        "strength": "200 mg",
+        "quantity_left": 10,
+        "dose_per_intake": 1,
+        "schedule": {
+          "type": "daily",
+          "times": [
+            "16:00"
+          ]
+        },
+        "start_date": "2025-11-09",
+        "end_date": null,
+        "color": "med-green"
       }
     ]
   },

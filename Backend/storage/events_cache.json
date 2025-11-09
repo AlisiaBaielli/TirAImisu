@@ -45,48 +45,26 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/7m9c7ephp3ia05c2gvnfsh3ovg"
     },
     {
-      "id": "4s6qdbru3mgc0uaec6egc65af3",
-      "title": "Event1",
-      "description": null,
+      "id": "6paa8hii97bmvdlf2ebbq3ij1f",
+      "title": "AISO Talks x Tulip Ventures",
+      "description": "Founding Felyx with Quinten Selhorst",
       "location": null,
       "status": "confirmed",
       "start": {
         "date": null,
-        "date_time": "2025-11-06T15:45:00Z",
+        "date_time": "2025-11-04T15:30:00Z",
         "time_zone": "Europe/Brussels"
       },
       "end": {
         "date": null,
-        "date_time": "2025-11-06T19:00:00Z",
+        "date_time": "2025-11-04T18:45:00Z",
         "time_zone": "Europe/Brussels"
       },
       "color": null,
       "provider": "google",
-      "provider_id": "4s6qdbru3mgc0uaec6egc65af3",
+      "provider_id": "6paa8hii97bmvdlf2ebbq3ij1f",
       "calendar_id": "cal_wqLqsEcnzX",
-      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/4s6qdbru3mgc0uaec6egc65af3"
-    },
-    {
-      "id": "2gk7kpfgegh6k5e5ol9pe74tob",
-      "title": "Test",
-      "description": null,
-      "location": null,
-      "status": "confirmed",
-      "start": {
-        "date": null,
-        "date_time": "2025-11-09T12:00:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "end": {
-        "date": null,
-        "date_time": "2025-11-09T13:15:00Z",
-        "time_zone": "Europe/Brussels"
-      },
-      "color": null,
-      "provider": "google",
-      "provider_id": "2gk7kpfgegh6k5e5ol9pe74tob",
-      "calendar_id": "cal_wqLqsEcnzX",
-      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/2gk7kpfgegh6k5e5ol9pe74tob"
+      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/6paa8hii97bmvdlf2ebbq3ij1f"
     }
   ]
 }
