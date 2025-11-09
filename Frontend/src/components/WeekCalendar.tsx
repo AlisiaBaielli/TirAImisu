@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   format,
   addDays,
@@ -199,6 +199,17 @@ const WeekCalendar = () => {
   }, [medications]);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const HOUR_ROW_HEIGHT = 60;   // matches your CSS min-h-[60px]
+    const targetTop = 9 * HOUR_ROW_HEIGHT; // scroll to 09:00 row
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({ top: targetTop, behavior: "smooth" });
+    }
+  }, []);
+
 
   const layoutColumns = (items: CalendarChip[]) => {
     const sorted = [...items].sort(
