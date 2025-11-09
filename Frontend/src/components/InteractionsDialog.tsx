@@ -32,7 +32,7 @@ const InteractionsDialog = ({
 
   const handleEmailDoctor = async () => {
     const userId = parseInt(localStorage.getItem("userId") || "1", 10);
-    const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
+    const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
 
     const content =
       `Potential interaction detected.\n` +

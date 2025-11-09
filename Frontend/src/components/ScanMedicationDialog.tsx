@@ -82,7 +82,7 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
       try {
         const base64 = dataUrl.split(",")[1];
         const userId = localStorage.getItem("userId") || "1";
-        const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
+        const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
         const res = await fetch(`${base}/api/camera-agent/scan`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },

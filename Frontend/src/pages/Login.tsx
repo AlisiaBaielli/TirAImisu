@@ -21,7 +21,7 @@ const Login = () => {
     }
     try {
       setLoading(true);
-      const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost";
+      const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
       const res = await fetch(`${base}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
