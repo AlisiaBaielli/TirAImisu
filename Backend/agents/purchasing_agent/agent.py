@@ -98,7 +98,7 @@ def find_medication_entry(user_id: str, drug_name: str) -> dict:
     raise ValueError(f"Medication '{drug_name}' not found. Available: {available}")
 
 
-async def run_checkout(user_id: str, drug_name: str):
+async def run_checkout(user_id: str, drug_name: str, on_event=None):
     user = load_user(user_id)
     product = {"name": drug_name, "quantity": 1}
 
@@ -110,7 +110,20 @@ async def run_checkout(user_id: str, drug_name: str):
         llm=llm,
         browser=browser,
     )
+
+    # Emit helper
+    def emit(payload: dict):
+        if on_event:
+            on_event({"type": "status", **payload})
+
+    emit({"stage": "agent", "message": "Agent starting…"})
+
+    # If your Agent supports hooks/callbacks, wire them here and call emit(...)
+    # Otherwise, do coarse-grained updates around calls you control:
     history = await agent.run()
+    emit({"stage": "agent", "message": "Agent finished."})
+
+    # Optionally summarize for the final 'done' payload
     return history
 
 

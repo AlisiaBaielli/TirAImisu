@@ -9,6 +9,9 @@ import MyData from "./pages/MyData";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 
+// ✅ add this import:
+import LiveViz from "./pages/LifeViz";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -22,6 +25,10 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/my-data" element={<MyData />} />
           <Route path="/chat" element={<Chat />} />
+
+          {/* ✅ add this new route */}
+          <Route path="/live-viz" element={<LiveViz />} />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

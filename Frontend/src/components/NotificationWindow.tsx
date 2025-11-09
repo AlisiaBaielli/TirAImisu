@@ -84,6 +84,22 @@ const handleOrder = async (n: NotificationItem) => {
   const medName = n?.metadata?.medicationName;
   if (!medName) return toast.error("No medication name found");
 
+  // 1) Open the tab synchronously to avoid popup blockers
+  const win = window.open("about:blank", "_blank", "noopener,noreferrer");
+  if (!win) {
+    toast.error("Popup blocked. Allow popups for this site to open the live window.");
+    return;
+  }
+
+  // Optional: show a quick loading message in the new tab
+  win.document.write(`
+    <html><head><title>Starting order...</title></head>
+    <body style="font-family:sans-serif;padding:24px">
+      <h2>Starting order for ${medName}…</h2>
+      <p>This window will update automatically.</p>
+    </body></html>
+  `);
+
   setOrderingIds(prev => new Set(prev).add(n.id));
   try {
     const res = await fetch(`${baseUrl}/api/buy`, {
@@ -95,11 +111,27 @@ const handleOrder = async (n: NotificationItem) => {
       const err = await res.json().catch(() => ({}));
       throw new Error(err?.detail || `Order failed (${res.status})`);
     }
+
     const data = await res.json();
-    toast.success(`Order started for ${data.ordered}.`);
+    // Expect your API to return an identifier you can use on the live page
+    // e.g. { ordered: "Amoxicillin", order_id: "abc123" }
+    const orderId = data.order_id ?? data.id ?? null;
+
+    toast.success(`Order started for ${data.ordered || medName}.`);
     setDismissed(prev => new Set(prev).add(n.id));
+
+    // 2) Navigate the already-opened tab to your live page
+    // Include whatever query params your live page needs to subscribe to updates
+    const origin = window.location.origin;
+    const liveUrl = orderId
+      ? `${origin}/live-viz?orderId=${encodeURIComponent(orderId)}`
+      : `${origin}/live-viz?drug=${encodeURIComponent(medName)}`;
+
+    win.location.replace(liveUrl);
   } catch (e: any) {
-    toast.error(e.message || "Failed to place order.");
+    // Close the tab we opened, since we’re aborting
+    try { win.close(); } catch {}
+    toast.error(e?.message || "Failed to place order.");
   } finally {
     setOrderingIds(prev => {
       const next = new Set(prev);
@@ -108,6 +140,7 @@ const handleOrder = async (n: NotificationItem) => {
     });
   }
 };
+
 
   const handleDismiss = (n: NotificationItem) => {
     setDismissed((prev) => new Set(prev).add(n.id));

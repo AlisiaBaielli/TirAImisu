@@ -1,10 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+
+
+ORDER_STREAMS: dict[str, asyncio.Queue] = {}  # order_id -> asyncio.Queue[dict]
+ORDER_LOCK = asyncio.Lock()
+
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta, date
-from fastapi import status
+from fastapi import status, BackgroundTasks
 import json
 import os
 import uuid
@@ -37,6 +43,8 @@ logger = logging.getLogger("api")
 chat_agent = ChatAgent()
 
 allowed_origins = [
+    "http://localhost",  # ✅ add
+    "http://127.0.0.1",
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:8080",
@@ -55,6 +63,14 @@ app.add_middleware(
 )
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+async def publish(order_id: str, event: dict):
+    q = ORDER_STREAMS.get(order_id)
+    if q:
+        await q.put(
+            {**event, "order_id": order_id, "ts": datetime.utcnow().isoformat() + "Z"}
+        )
 
 
 def _load_json(name: str) -> Any:
@@ -248,7 +264,9 @@ class MedicationCreate(BaseModel):
 
 @app.post("/api/medications")
 def create_medication(payload: MedicationCreate) -> dict:
-    is_scan = bool(payload.occurrences) or (payload.description and "scan" in payload.description.lower())
+    is_scan = bool(payload.occurrences) or (
+        payload.description and "scan" in payload.description.lower()
+    )
 
     if is_scan and payload.occurrences:
         # Renewal or new via scan:
@@ -376,12 +394,96 @@ def refresh_events_calendar_events() -> dict:
 
 
 @app.post("/api/buy")
-async def buy(data: dict):
+async def buy(data: dict, background_tasks: BackgroundTasks):
     drug_name = data.get("drug_name")
     if not drug_name:
         raise HTTPException(status_code=400, detail="drug_name is required")
-    result = await run_checkout(user_id="1", drug_name=drug_name)
-    return {"ok": True, "ordered": drug_name, "result": result}
+
+    order_id = uuid.uuid4().hex
+
+    # Create a queue for this order’s events
+    async with ORDER_LOCK:
+        ORDER_STREAMS[order_id] = asyncio.Queue()
+
+    # Immediately announce start (frontend tab already opened)
+    await publish(
+        order_id,
+        {
+            "type": "status",
+            "stage": "starting",
+            "message": f"Starting order for {drug_name}…",
+        },
+    )
+
+    async def runner():
+        try:
+            # Optional: early heartbeat while the browser boots
+            await publish(
+                order_id,
+                {"type": "status", "stage": "browser", "message": "Launching browser…"},
+            )
+
+            # Run the automation; pass a callback to stream progress (see step 4)
+            result = await run_checkout(
+                user_id="1",
+                drug_name=drug_name,
+                on_event=lambda e: asyncio.create_task(publish(order_id, e)),
+            )
+
+            # Done
+            await publish(order_id, {"type": "done", "result": result})
+        except Exception as e:
+            await publish(order_id, {"type": "error", "message": str(e)})
+        finally:
+            # Give clients a moment to read the last event, then clean up
+            await asyncio.sleep(5)
+            async with ORDER_LOCK:
+                ORDER_STREAMS.pop(order_id, None)
+
+    background_tasks.add_task(runner)
+
+    # Frontend needs order_id to connect to /ws/viz
+    return {"ok": True, "ordered": drug_name, "order_id": order_id}
+
+
+@app.websocket("/ws/viz")
+async def ws_viz(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        # Read orderId from query params (e.g., /ws/viz?orderId=abc)
+        order_id = websocket.query_params.get("orderId")
+        if not order_id:
+            await websocket.send_json(
+                {"type": "error", "message": "orderId is required"}
+            )
+            await websocket.close()
+            return
+
+        # If the order doesn't exist (yet), wait briefly for it to be registered
+        for _ in range(20):  # ~2s total
+            q = ORDER_STREAMS.get(order_id)
+            if q:
+                break
+            await asyncio.sleep(0.1)
+        else:
+            await websocket.send_json({"type": "error", "message": "unknown orderId"})
+            await websocket.close()
+            return
+
+        # Send a hello
+        await websocket.send_json({"type": "hello", "order_id": order_id})
+
+        # Pump events to this client
+        q = ORDER_STREAMS[order_id]
+        while True:
+            event = await q.get()
+            await websocket.send_json(event)
+            if event.get("type") in ("done", "error"):
+                # Optionally keep the socket open; here we close after final event
+                await websocket.close()
+                break
+    except WebSocketDisconnect:
+        return
 
 
 # Camera scan endpoint left unchanged...
@@ -484,7 +586,7 @@ def drug_interactions_check(payload: DrugInteractionRequest):
         logger.exception("Failed to send email to doctor")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {str(exc)}"
+            detail=f"Unexpected error: {str(exc)}",
         )
 
     out = []
@@ -501,6 +603,7 @@ def drug_interactions_check(payload: DrugInteractionRequest):
         )
 
     return {"interactions": out}
+
 
 class SendEmailRequest(BaseModel):
     user_id: int = Field(1, ge=1)
@@ -520,13 +623,13 @@ class SendEmailResponse(BaseModel):
 def send_email_endpoint(payload: SendEmailRequest):
     try:
         result = send_email_to_doctor(user_id=payload.user_id, content=payload.content)
-        
+
         if not result.get("success"):
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=result.get("error", "Failed to send email")
+                detail=result.get("error", "Failed to send email"),
             )
-        
+
         return SendEmailResponse(
             success=result["success"],
             message_id=result.get("message_id"),
@@ -537,25 +640,25 @@ def send_email_endpoint(payload: SendEmailRequest):
     except HTTPException:
         raise
 
+
 class ChatRequest(BaseModel):
     message: str
     user_id: str
 
+
 @app.post("/api/chat")
 def handle_chat(payload: ChatRequest):
     """
-    Receives a user's message, runs it through the ChatAgent, 
+    Receives a user's message, runs it through the ChatAgent,
     and returns the agent's final response
     """
     try:
-        response_text = chat_agent.run(
-            text=payload.message,
-            thread_id=payload.user_id
-        )
+        response_text = chat_agent.run(text=payload.message, thread_id=payload.user_id)
         return {"response": response_text}
     except Exception as e:
         print(f"Chat agent error: {e}")
-        raise HTTPException(status_code=500, detail="Error processing chat message") 
+        raise HTTPException(status_code=500, detail="Error processing chat message")
+
 
 if __name__ == "__main__":
     import uvicorn
