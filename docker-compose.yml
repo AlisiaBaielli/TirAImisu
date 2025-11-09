@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+    image: pillpal-api:latest
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    # Optional persistent cache for Playwright (faster cold start)
+    # volumes:
+    #   - playwright-cache:/ms-playwright
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+    image: pillpal-web:latest
+    depends_on:
+      - api
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+# volumes:
+#   playwright-cache:

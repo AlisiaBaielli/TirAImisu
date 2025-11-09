@@ -74,7 +74,6 @@ USER DETAILS
 CONSTRAINTS
 - Stay on drogist.nl
 - Accept minimal cookies if banner appears
-- Do NOT complete payment — stop before purchase
 - If product not found, do not substitute — report failure
 
 OUTPUT

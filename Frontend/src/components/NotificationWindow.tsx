@@ -70,10 +70,35 @@ const NotificationWindow = () => {
     toast.info("We’ll remind you again later.");
   };
 
-  const handleOrder = (n: NotificationItem) => {
-    setDismissed((prev) => new Set(prev).add(n.id));
-    const med = n?.metadata?.medicationName ? ` ${n.metadata.medicationName}` : "";
-    toast.success(`Order placed for${med}.`);
+  const [orderingIds, setOrderingIds] = useState<Set<string>>(new Set());
+
+  const handleOrder = async (n: NotificationItem) => {
+    const medName = n?.metadata?.medicationName;
+    if (!medName) return toast.error("No medication name found");
+  
+    setOrderingIds(prev => new Set(prev).add(n.id));
+    try {
+      const res = await fetch(`${baseUrl}/api/buy`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drug_name: medName }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.detail || `Order failed (${res.status})`);
+      }
+      const data = await res.json();
+      toast.success(`Order started for ${data.ordered}.`);
+      setDismissed(prev => new Set(prev).add(n.id));
+    } catch (e: any) {
+      toast.error(e.message || "Failed to place order.");
+    } finally {
+      setOrderingIds(prev => {
+        const next = new Set(prev);
+        next.delete(n.id);
+        return next;
+      });
+    }
   };
 
   const handleDismiss = (n: NotificationItem) => {
