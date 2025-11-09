@@ -16,7 +16,7 @@ PillPal is a lightweight frictionless multi-agent medication-assistant prototype
 
 ## Instructions
 
-1. Navigate to [https://www.pillpal.com](http://199.247.26.114/)
+1. Navigate to https://morbifically-unsulphonated-elia.ngrok-free.dev 
    
 2. For demonstration purposes, login with username: jan.jansen - password: password. This profile already has medication loaded which will be useful for our demo. You could also create your own username - passsword combination but the profile will be empty by default. 
 
