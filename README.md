@@ -11,13 +11,13 @@ PillPal is a lightweight multi-agent medication-assistant prototype. It uses 3 d
 
 1. Navigate to https://www.website.com
    
-2. Login with any username - password combination.
+2. For demonstration purposes, login with username: jan.jansen - password: password. This profile already has medication loaded which will be useful for our demo. You could also create your own username - passsword combination but the profile will be empty by default. 
 
 3. Click the "Add Medication" button.
 
 4. Scan your medication box if you have it or enter the details manually. To showcase the interaction functionality enter a medication that will interact with another (try Ibuprofen).
    
-5. Try entering a low amount (try 3 pills) and enter a high frequency (try Daily) so that it will trigger the purchasing agent.
+5. Try entering a low amount (try 3 pills) and enter a high frequency (try Daily) so that it will trigger the purchasing agent. 
    
 6. In the bottom left, ask the agent a question (try "Can I drink alcohol?"). Observe the agent's response.
    
