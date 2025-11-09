@@ -36,7 +36,7 @@ SYSTEM_PROMPT = SystemMessage(
 class ChatAgent:
     """Minimal single-agent wrapper around a LangGraph ReAct agent."""
 
-    def __init__(self, model: str = "gpt-4o"):
+    def __init__(self, model: str = "gpt-5"):
         self.memory = MemorySaver()
         self.llm = ChatOpenAI(model=model)
         # Create a single-node ReAct agent with our tools and system prompt
