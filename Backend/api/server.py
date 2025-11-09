@@ -9,6 +9,7 @@ import json
 import os
 import uuid
 import logging
+from typing import Any, Dict, List, Optional
 
 from Backend.agents.purchasing_agent.agent import run_checkout
 from Backend.storage.events import get_events, set_events
@@ -18,7 +19,7 @@ from Backend.medications.repository import (
     get_medication_events,
     upsert_scanned_medication,
 )
-from Backend.calendar.cal_tools import create_recurring_events
+# from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
 from Backend.agents.camera_agent.agent import CameraAgent
 from Backend.data.utils import add_new_medication, retrieve_medications, ensure_colors
@@ -494,11 +495,10 @@ class SendEmailRequest(BaseModel):
 class SendEmailResponse(BaseModel):
     success: bool
     message_id: Optional[str] = None
-    to: Optional[str] = None
+    to: Optional[List[str]] = None
     from_email: Optional[str] = Field(None, alias="from")
     subject: Optional[str] = None
     error: Optional[str] = None
-
 
 @app.post("/api/send-email-to-doctor", response_model=SendEmailResponse)
 def send_email_endpoint(payload: SendEmailRequest):
@@ -510,11 +510,14 @@ def send_email_endpoint(payload: SendEmailRequest):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=result.get("error", "Failed to send email")
             )
-        
+
+        to_value = result.get("to")
+        to_list = [to_value] if isinstance(to_value, str) else to_value
+
         return SendEmailResponse(
             success=result["success"],
             message_id=result.get("message_id"),
-            to=result.get("to"),
+            to=to_list,
             from_email=result.get("from"),
             subject=result.get("subject"),
         )

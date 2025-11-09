@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +8,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, CheckCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface InteractionsDialogProps {
   open: boolean;
@@ -26,20 +28,38 @@ const InteractionsDialog = ({
   description = "Potential interaction detected.",
   interactionFound = false,
 }: InteractionsDialogProps) => {
-  const handleEmailDoctor = () => {
+  const [sending, setSending] = useState(false);
+
+  const handleEmailDoctor = async () => {
+    const userId = parseInt(localStorage.getItem("userId") || "1", 10);
+    const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+
+    const content =
+      `Potential interaction detected.\n` +
+      `New medication: ${newMedicationName || "Unknown"}\n` +
+      `Conflicts with: ${conflictWith || "Unknown"}\n` +
+      `Details: ${description || "N/A"}`;
+
     try {
-      const stored = localStorage.getItem("userData");
-      const doctorEmail = stored ? (JSON.parse(stored).doctorEmail as string | undefined) : undefined;
-      const to = doctorEmail && doctorEmail.includes("@") ? doctorEmail : "doctor@example.com";
-      const subject = encodeURIComponent("Medication Interaction Concern");
-      const body = encodeURIComponent(
-        `Hello Doctor,\n\nI noticed a potential interaction between "${newMedicationName}" and "${conflictWith}".\n\nDetails: ${description}\n\nCould you please advise?\n\nThank you.`
-      );
-      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
-    } catch {
-      window.location.href = "mailto:doctor@example.com?subject=Medication%20Interaction";
+      setSending(true);
+      const res = await fetch(`${base}/api/send-email-to-doctor`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, content }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.success === false) {
+        throw new Error(data?.detail || data?.error || `Failed to send email (status ${res.status})`);
+      }
+
+      toast.success("Email sent to your doctor.");
+      onOpenChange(false);
+    } catch (err: any) {
+      toast.error(err?.message || "Could not send email.");
+    } finally {
+      setSending(false);
     }
-    onOpenChange(false);
   };
 
   return (
@@ -75,8 +95,15 @@ const InteractionsDialog = ({
 
         <DialogFooter>
           {interactionFound ? (
-            <Button variant="destructive" onClick={handleEmailDoctor}>
-              Email your doctor
+            <Button variant="destructive" onClick={handleEmailDoctor} disabled={sending}>
+              {sending ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Sending…
+                </span>
+              ) : (
+                "Email your doctor"
+              )}
             </Button>
           ) : (
             <Button onClick={() => onOpenChange(false)}>Close</Button>
