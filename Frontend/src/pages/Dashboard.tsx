@@ -39,7 +39,7 @@ const Dashboard = () => {
             <img src={logo} alt="PillPal logo" className="h-14 w-14 rounded-lg shrink-0" />
             <h1 className="text-2xl font-bold text-primary shrink-0">PillPal</h1>
             {username && (
-              <span className="text-sm text-muted-foreground truncate max-w-[40vw]">
+              <span className="text-xl text-muted-foreground truncate max-w-[40vw]">
                 Welcome, {username}
               </span>
             )}

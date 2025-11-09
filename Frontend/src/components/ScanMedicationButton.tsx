@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Camera } from "lucide-react";
+import { Camera, Settings } from "lucide-react";
 import ScanMedicationDialog, { NewMedicationPayload } from "./ScanMedicationDialog";
-import InteractionsDialog, { InteractionSeverity } from "./InteractionsDialog";
+import InteractionsDialog from "./InteractionsDialog";
 import { toast } from "sonner";
 
 const ScanMedicationButton = () => {
@@ -11,18 +11,21 @@ const ScanMedicationButton = () => {
 
   const [newMed, setNewMed] = useState<string | undefined>();
   const [conflictWith, setConflictWith] = useState<string | undefined>();
-  const [severity, setSeverity] = useState<InteractionSeverity>("low");
   const [description, setDescription] = useState<string | undefined>();
   const [interactionFound, setInteractionFound] = useState<boolean>(false);
+
+  // Top-center floating loading
+  const [checking, setChecking] = useState(false);
 
   const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
   const handleScanConfirm = async (data: NewMedicationPayload) => {
     setScanOpen(false);
+    setChecking(true); // show "Checking interactions..." banner
 
     const userId = localStorage.getItem("userId") || "1";
 
-    // Build payload to persist into personal_medication.json via new backend endpoint
+    // Build payload to persist into personal_medication.json
     const drugName = data.name.trim();
     const strength = data.dosage.trim();
     const quantity = data.numberOfPills ? parseInt(data.numberOfPills, 10) || 0 : 0;
@@ -42,7 +45,7 @@ const ScanMedicationButton = () => {
     };
 
     try {
-      // 1) persist medication to personal_medication.json
+      // 1) persist medication
       const resAdd = await fetch(`${base}/api/users/${encodeURIComponent(userId)}/medications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,11 +57,10 @@ const ScanMedicationButton = () => {
         throw new Error(`Failed to save medication: ${txt}`);
       }
 
-      // update UI list
+      // update list
       window.dispatchEvent(new Event("medications:updated"));
 
-      // 2) call drug-interactions API (server will use saved personal_medication.json to compare)
-      const newMedFullName = drugName;
+      // 2) interactions (only send drug name)
       const res = await fetch(`${base}/api/drug-interactions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -73,37 +75,42 @@ const ScanMedicationButton = () => {
       const json = await res.json();
       const interactions = Array.isArray(json?.interactions) ? json.interactions : [];
 
-      setNewMed(newMedFullName);
+      setNewMed(drugName);
 
       if (interactions.length > 0) {
-        // show first interaction (you can expand to show all)
         const first = interactions[0];
         setConflictWith(first.existing_drug);
-        const sev = (first.severity || "").toLowerCase();
-        setSeverity(sev === "severe" || sev === "high" ? "high" : "low");
         setDescription(first.description || first.extended_description || "Potential interaction detected.");
         setInteractionFound(Boolean(first.interaction_found));
       } else {
         setConflictWith(undefined);
-        setSeverity("low");
         setDescription("No interactions detected with current medications.");
         setInteractionFound(false);
       }
     } catch (e: any) {
-      // API must drive the content. Show error message returned.
       setNewMed(`${data.name}${data.dosage ? ` (${data.dosage})` : ""}`);
       setConflictWith(undefined);
-      setSeverity("low");
       setDescription(e?.message ?? "Interaction check failed");
       setInteractionFound(false);
       toast.error(e?.message ?? "Error during save/check");
     } finally {
+      setChecking(false); // hide banner
       setInteractionsOpen(true);
     }
   };
 
   return (
     <>
+      {/* Floating top-center gear while checking */}
+      {checking && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] pointer-events-none">
+          <div className="bg-black/80 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+            <Settings className="h-4 w-4 animate-spin" />
+            <span className="text-sm font-medium">Checking interactions…</span>
+          </div>
+        </div>
+      )}
+
       <Button
         size="lg"
         className="fixed bottom-8 left-1/2 -translate-x-1/2 shadow-lg gap-2 z-50"
@@ -120,7 +127,6 @@ const ScanMedicationButton = () => {
         onOpenChange={setInteractionsOpen}
         newMedicationName={newMed}
         conflictWith={conflictWith}
-        severity={severity}
         description={description}
         interactionFound={interactionFound}
       />

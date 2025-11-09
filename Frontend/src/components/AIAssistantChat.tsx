@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot, Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   id: number;
@@ -17,7 +19,6 @@ const AIAssistantChat = () => {
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  // Replace your old handleSend in AIAssistantChat.tsx with this:
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -34,7 +35,7 @@ const AIAssistantChat = () => {
     try {
       const userId = localStorage.getItem("userId");
       if (!userId) {
-        throw new Error("user_id not found in localStorage");
+        throw new Error("userId not found in localStorage");
       }
 
       // Send the request to your backend
@@ -55,12 +56,8 @@ const AIAssistantChat = () => {
       const data = await response.json();
       console.log('Data from server:', data);
       
-      // Use data[1] based on your curl test
       const botReply = data.response; 
       console.log('Parsed bot reply:', botReply);
-      
-      // Or, if you fixed your backend to return {"response": ...}
-      // const botReply = data.response;
 
       if (!botReply) {
          throw new Error("Invalid response format from server.");
@@ -110,7 +107,9 @@ const AIAssistantChat = () => {
                     : "bg-secondary text-secondary-foreground"
                 }`}
               >
-                {m.text}
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {m.text}
+                </ReactMarkdown>
               </div>
             </div>
           ))}
