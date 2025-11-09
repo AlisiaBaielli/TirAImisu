@@ -122,6 +122,7 @@ const handleOrder = async (n: NotificationItem) => {
         <CardTitle className="text-sm font-medium flex items-center gap-2">
           <Bell className="h-4 w-4 text-primary" />
           Notifications
+          <span className="text-xs text-muted-foreground">({visibleNotifications.length})</span>
         </CardTitle>
       </CardHeader>
       <CardContent

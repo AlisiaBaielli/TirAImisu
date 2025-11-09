@@ -38,3 +38,5 @@ prompt_toolkit==3.0.50
 opencv-python
 dotenv
 fastapi
+rich
+browser-use

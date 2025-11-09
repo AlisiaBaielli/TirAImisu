@@ -52,12 +52,12 @@
       "status": "confirmed",
       "start": {
         "date": null,
-        "date_time": "2025-11-08T22:00:00Z",
+        "date_time": "2025-11-08T22:45:00Z",
         "time_zone": "Europe/Brussels"
       },
       "end": {
         "date": null,
-        "date_time": "2025-11-08T23:00:00Z",
+        "date_time": "2025-11-08T23:45:00Z",
         "time_zone": "Europe/Brussels"
       },
       "color": null,

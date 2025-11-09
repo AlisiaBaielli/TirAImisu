@@ -270,3 +270,85 @@ def get_medication_events() -> List[Dict[str, Any]]:
             )
 
     return results
+
+
+def _split_name(name: str) -> tuple[str, str]:
+    name = (name or "").strip()
+    if " " in name:
+        parts = name.rsplit(" ", 1)
+        if len(parts) == 2:
+            return parts[0].strip(), parts[1].strip()
+    return name, ""
+
+
+def upsert_scanned_medication(
+    name: str,
+    quantity: int,
+    time: Optional[int] = None,
+    hour_interval: Optional[int] = None,
+    start_date: Optional[str] = None,
+) -> Medication:
+    """
+    If medication (drug_name + strength) exists for the current user, increment its quantity_left.
+    Otherwise, create a new entry with the provided quantity and basic schedule inferred from time/hour_interval.
+    Returns a Medication DTO representing the upserted medication (best-effort).
+    """
+    json_path = _get_personal_json_path()
+    user_id = _get_user_id()
+    doc = _load_json(json_path)
+    user_entry = next((u for u in doc if str(u.get("user_id")) == str(user_id)), None)
+    if not user_entry:
+        user_entry = {"user_id": str(user_id), "medications": []}
+        doc.append(user_entry)
+    meds = user_entry.get("medications") or []
+
+    drug_name, strength = _split_name(name)
+    idx = None
+    for i, m in enumerate(meds):
+        if str(m.get("drug_name", "")).strip().lower() == drug_name.lower() and str(m.get("strength", "")).strip().lower() == strength.lower():
+            idx = i
+            break
+
+    qty_to_add = max(0, int(quantity or 0))
+    if idx is not None:
+        # Update existing
+        current_qty = int(meds[idx].get("quantity_left", 0) or 0)
+        meds[idx]["quantity_left"] = current_qty + qty_to_add
+        user_entry["medications"] = meds
+        _save_json(json_path, doc)
+    else:
+        # Add new with given quantity and inferred schedule
+        inferred_hour_interval = int(hour_interval) if hour_interval is not None else 24
+        inferred_time = int(time) if time is not None else 8
+        schedule = (
+            {"type": "weekly", "day": "Sunday", "time": f"{inferred_time:02d}:00"}
+            if inferred_hour_interval >= 168
+            else {"type": "daily", "times": [f"{inferred_time:02d}:00"]}
+        )
+        new_entry: Dict[str, Any] = {
+            "drug_name": drug_name,
+            "strength": strength,
+            "quantity_left": qty_to_add,
+            "dose_per_intake": 1,
+            "schedule": schedule,
+            "start_date": start_date or os.getenv("PERSONAL_MED_START_DATE", date.today().strftime("%Y-%m-%d")),
+        }
+        meds.append(new_entry)
+        user_entry["medications"] = meds
+        _save_json(json_path, doc)
+
+    # Return DTO based on current list
+    meds_list = get_current_medications()
+    # Try to find matching DTO
+    dto = next((m for m in meds_list if m.name.strip().lower() == f"{drug_name} {strength}".strip().lower()), None)
+    if dto:
+        return dto
+    # Fallback DTO
+    return Medication(
+        id=_next_id(meds_list),
+        name=f"{drug_name} {strength}".strip(),
+        time=int(time or 8),
+        color="med-blue",
+        hour_interval=int(hour_interval or 24),
+        description=None,
+    )

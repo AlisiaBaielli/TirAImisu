@@ -75,10 +75,39 @@ def _assign_unique_color(existing: List[Dict[str, Any]], new_norm: str) -> str:
 def add_new_medication(user_id: str, new_medication: Dict[str, Any]) -> bool:
     data = _read_json(MEDICATION_FILE)
     entry = _ensure_user_entry(data, user_id)
-    norm = _normalize_name(new_medication)
-    if not new_medication.get("color"):
-        new_medication["color"] = _assign_unique_color(entry["medications"], norm)
-    entry["medications"].append(new_medication)
+    meds = entry["medications"]
+    
+    # Normalize keys for comparison
+    new_name = str(new_medication.get("drug_name", "")).strip().lower()
+    new_strength = str(new_medication.get("strength", "")).strip().lower()
+    new_qty = int(new_medication.get("quantity_left", 0) or 0)
+
+    # Try to find existing medication with same name + strength
+    found_idx = None
+    for i, m in enumerate(meds):
+        if (
+            str(m.get("drug_name", "")).strip().lower() == new_name
+            and str(m.get("strength", "")).strip().lower() == new_strength
+        ):
+            found_idx = i
+            break
+
+    if found_idx is not None:
+        # Renewal: increment quantity_left
+        current_qty = int(meds[found_idx].get("quantity_left", 0) or 0)
+        meds[found_idx]["quantity_left"] = current_qty + new_qty
+    else:
+        # New medication: ensure required fields and assign color
+        if "dose_per_intake" not in new_medication:
+            new_medication["dose_per_intake"] = 1
+        if "schedule" not in new_medication:
+            new_medication["schedule"] = {}
+        norm = _normalize_name(new_medication)
+        if not new_medication.get("color"):
+            new_medication["color"] = _assign_unique_color(meds, norm)
+        meds.append(new_medication)
+    
+    entry["medications"] = meds
     return _write_json(MEDICATION_FILE, data)
 
 

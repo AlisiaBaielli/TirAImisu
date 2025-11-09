@@ -16,6 +16,7 @@ from Backend.medications.repository import (
     get_current_medications,
     add_medication,
     get_medication_events,
+    upsert_scanned_medication,
 )
 from Backend.calendar.cal_tools import create_recurring_events
 from Backend.notifications.service import get_notifications as build_notifications
@@ -244,58 +245,74 @@ class MedicationCreate(BaseModel):
 
 @app.post("/api/medications")
 def create_medication(payload: MedicationCreate) -> dict:
-    med = add_medication(
-        name=payload.name.strip(),
-        time=payload.time,
-        color=payload.color.strip(),
-        hour_interval=payload.hour_interval,
-        description=payload.description.strip() if payload.description else None,
-        start_date=payload.start_date,
-    )
-    try:
-        calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
-        if calendar_id:
-            if payload.start_date:
-                start_date_obj = datetime.strptime(
-                    payload.start_date, "%Y-%m-%d"
-                ).date()
-            else:
-                start_date_obj = date.today()
-            start_dt = datetime(
-                year=start_date_obj.year,
-                month=start_date_obj.month,
-                day=start_date_obj.day,
-                hour=med.time,
-                minute=0,
-            )
-            end_dt = start_dt + timedelta(minutes=10)
-            occ = payload.occurrences
-            if not occ and payload.end_date:
-                try:
-                    end_date_obj = datetime.strptime(
-                        payload.end_date, "%Y-%m-%d"
-                    ).date()
-                    total_hours = (
-                        datetime.combine(end_date_obj, datetime.min.time())
-                        - datetime.combine(start_date_obj, datetime.min.time())
-                    ).days * 24
-                    occ = max(1, (total_hours // med.hour_interval) + 1)
-                except Exception:
-                    occ = None
-            if not occ:
-                occ = 7
-            create_recurring_events(
-                calendar_id=calendar_id,
-                title=med.name,
-                start_dt=start_dt,
-                end_dt=end_dt,
-                occurrences=occ,
-                hour_interval=med.hour_interval,
-                description=med.description,
-                location=None,
-            )
-    except Exception:
-        pass
+    is_scan = bool(payload.occurrences) or (payload.description and "scan" in payload.description.lower())
+
+    if is_scan and payload.occurrences:
+        # Renewal or new via scan:
+        # - If exists (same drug_name + strength), only increment quantity_left
+        # - If new, create with inferred schedule from provided time/hour_interval
+        med = upsert_scanned_medication(
+            name=payload.name.strip(),
+            quantity=int(payload.occurrences),
+            time=payload.time,
+            hour_interval=payload.hour_interval,
+            start_date=payload.start_date,
+        )
+    else:
+        # Regular add (manual entry form)
+        med = add_medication(
+            name=payload.name.strip(),
+            time=payload.time,
+            color=payload.color.strip(),
+            hour_interval=payload.hour_interval,
+            description=payload.description.strip() if payload.description else None,
+            start_date=payload.start_date,
+        )
+        # Calendar creation for regular (non-scan) medications
+        # try:
+        #     calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
+        #     if calendar_id:
+        #         if payload.start_date:
+        #             start_date_obj = datetime.strptime(
+        #                 payload.start_date, "%Y-%m-%d"
+        #             ).date()
+        #         else:
+        #             start_date_obj = date.today()
+        #         start_dt = datetime(
+        #             year=start_date_obj.year,
+        #             month=start_date_obj.month,
+        #             day=start_date_obj.day,
+        #             hour=med.time,
+        #             minute=0,
+        #         )
+        #         end_dt = start_dt + timedelta(minutes=10)
+        #         occ = payload.occurrences
+        #         if not occ and payload.end_date:
+        #             try:
+        #                 end_date_obj = datetime.strptime(
+        #                     payload.end_date, "%Y-%m-%d"
+        #                 ).date()
+        #                 total_hours = (
+        #                     datetime.combine(end_date_obj, datetime.min.time())
+        #                     - datetime.combine(start_date_obj, datetime.min.time())
+        #                 ).days * 24
+        #                 occ = max(1, (total_hours // med.hour_interval) + 1)
+        #             except Exception:
+        #                 occ = None
+        #         if not occ:
+        #             occ = 7
+        #         create_recurring_events(
+        #             calendar_id=calendar_id,
+        #             title=med.name,
+        #             start_dt=start_dt,
+        #             end_dt=end_dt,
+        #             occurrences=occ,
+        #             hour_interval=med.hour_interval,
+        #             description=med.description,
+        #             location=None,
+        #         )
+        # except Exception:
+        #     pass
     return {"medication": med.to_dict()}
 
 
@@ -355,7 +372,6 @@ def refresh_events_calendar_events() -> dict:
         raise HTTPException(status_code=500, detail=str(exc))
 
 
-@app.post("/api/buy")
 @app.post("/api/buy")
 async def buy(data: dict):
     drug_name = data.get("drug_name")
