@@ -269,50 +269,50 @@ def create_medication(payload: MedicationCreate) -> dict:
             start_date=payload.start_date,
         )
         # Calendar creation for regular (non-scan) medications
-        try:
-            calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
-            if calendar_id:
-                if payload.start_date:
-                    start_date_obj = datetime.strptime(
-                        payload.start_date, "%Y-%m-%d"
-                    ).date()
-                else:
-                    start_date_obj = date.today()
-                start_dt = datetime(
-                    year=start_date_obj.year,
-                    month=start_date_obj.month,
-                    day=start_date_obj.day,
-                    hour=med.time,
-                    minute=0,
-                )
-                end_dt = start_dt + timedelta(minutes=10)
-                occ = payload.occurrences
-                if not occ and payload.end_date:
-                    try:
-                        end_date_obj = datetime.strptime(
-                            payload.end_date, "%Y-%m-%d"
-                        ).date()
-                        total_hours = (
-                            datetime.combine(end_date_obj, datetime.min.time())
-                            - datetime.combine(start_date_obj, datetime.min.time())
-                        ).days * 24
-                        occ = max(1, (total_hours // med.hour_interval) + 1)
-                    except Exception:
-                        occ = None
-                if not occ:
-                    occ = 7
-                create_recurring_events(
-                    calendar_id=calendar_id,
-                    title=med.name,
-                    start_dt=start_dt,
-                    end_dt=end_dt,
-                    occurrences=occ,
-                    hour_interval=med.hour_interval,
-                    description=med.description,
-                    location=None,
-                )
-        except Exception:
-            pass
+        # try:
+        #     calendar_id = os.getenv("CALENDAR_ID") or os.getenv("DEFAULT_CALENDAR_ID")
+        #     if calendar_id:
+        #         if payload.start_date:
+        #             start_date_obj = datetime.strptime(
+        #                 payload.start_date, "%Y-%m-%d"
+        #             ).date()
+        #         else:
+        #             start_date_obj = date.today()
+        #         start_dt = datetime(
+        #             year=start_date_obj.year,
+        #             month=start_date_obj.month,
+        #             day=start_date_obj.day,
+        #             hour=med.time,
+        #             minute=0,
+        #         )
+        #         end_dt = start_dt + timedelta(minutes=10)
+        #         occ = payload.occurrences
+        #         if not occ and payload.end_date:
+        #             try:
+        #                 end_date_obj = datetime.strptime(
+        #                     payload.end_date, "%Y-%m-%d"
+        #                 ).date()
+        #                 total_hours = (
+        #                     datetime.combine(end_date_obj, datetime.min.time())
+        #                     - datetime.combine(start_date_obj, datetime.min.time())
+        #                 ).days * 24
+        #                 occ = max(1, (total_hours // med.hour_interval) + 1)
+        #             except Exception:
+        #                 occ = None
+        #         if not occ:
+        #             occ = 7
+        #         create_recurring_events(
+        #             calendar_id=calendar_id,
+        #             title=med.name,
+        #             start_dt=start_dt,
+        #             end_dt=end_dt,
+        #             occurrences=occ,
+        #             hour_interval=med.hour_interval,
+        #             description=med.description,
+        #             location=None,
+        #         )
+        # except Exception:
+        #     pass
     return {"medication": med.to_dict()}
 
 
