@@ -1,26 +1,48 @@
 {
   "cal_wqLqsEcnzX": [
     {
-      "id": "34s68vpl0nmvhjfrkm3bvo4959",
-      "title": "Event2",
+      "id": "7e3oc9iod27u0ojov6o1rcbr9b",
+      "title": "Prosus x AISO - Dinner, pitches, results",
       "description": null,
       "location": null,
       "status": "confirmed",
       "start": {
         "date": null,
-        "date_time": "2025-11-11T13:45:00Z",
+        "date_time": "2025-11-09T16:00:00Z",
         "time_zone": "Europe/Brussels"
       },
       "end": {
         "date": null,
-        "date_time": "2025-11-11T16:00:00Z",
+        "date_time": "2025-11-09T20:00:00Z",
         "time_zone": "Europe/Brussels"
       },
       "color": null,
       "provider": "google",
-      "provider_id": "34s68vpl0nmvhjfrkm3bvo4959",
+      "provider_id": "7e3oc9iod27u0ojov6o1rcbr9b",
       "calendar_id": "cal_wqLqsEcnzX",
-      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/34s68vpl0nmvhjfrkm3bvo4959"
+      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/7e3oc9iod27u0ojov6o1rcbr9b"
+    },
+    {
+      "id": "7m9c7ephp3ia05c2gvnfsh3ovg",
+      "title": "Prosus x AISO - Closing Party ",
+      "description": null,
+      "location": null,
+      "status": "confirmed",
+      "start": {
+        "date": null,
+        "date_time": "2025-11-09T20:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "end": {
+        "date": null,
+        "date_time": "2025-11-09T22:00:00Z",
+        "time_zone": "Europe/Brussels"
+      },
+      "color": null,
+      "provider": "google",
+      "provider_id": "7m9c7ephp3ia05c2gvnfsh3ovg",
+      "calendar_id": "cal_wqLqsEcnzX",
+      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/7m9c7ephp3ia05c2gvnfsh3ovg"
     },
     {
       "id": "4s6qdbru3mgc0uaec6egc65af3",
@@ -30,12 +52,12 @@
       "status": "confirmed",
       "start": {
         "date": null,
-        "date_time": "2025-11-06T13:30:00Z",
+        "date_time": "2025-11-06T15:45:00Z",
         "time_zone": "Europe/Brussels"
       },
       "end": {
         "date": null,
-        "date_time": "2025-11-06T16:45:00Z",
+        "date_time": "2025-11-06T19:00:00Z",
         "time_zone": "Europe/Brussels"
       },
       "color": null,
@@ -45,26 +67,26 @@
       "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/4s6qdbru3mgc0uaec6egc65af3"
     },
     {
-      "id": "6fluuvs8tbd9keg5tg63ce62a2",
-      "title": "AISO Drinks",
+      "id": "2gk7kpfgegh6k5e5ol9pe74tob",
+      "title": "Test",
       "description": null,
       "location": null,
       "status": "confirmed",
       "start": {
         "date": null,
-        "date_time": "2025-11-08T22:45:00Z",
+        "date_time": "2025-11-09T12:00:00Z",
         "time_zone": "Europe/Brussels"
       },
       "end": {
         "date": null,
-        "date_time": "2025-11-08T23:45:00Z",
+        "date_time": "2025-11-09T13:15:00Z",
         "time_zone": "Europe/Brussels"
       },
       "color": null,
       "provider": "google",
-      "provider_id": "6fluuvs8tbd9keg5tg63ce62a2",
+      "provider_id": "2gk7kpfgegh6k5e5ol9pe74tob",
       "calendar_id": "cal_wqLqsEcnzX",
-      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/6fluuvs8tbd9keg5tg63ce62a2"
+      "canonical_url": "https://api.calapi.io/calendars/cal_wqLqsEcnzX/events/2gk7kpfgegh6k5e5ol9pe74tob"
     }
   ]
 }
