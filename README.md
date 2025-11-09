@@ -1,8 +1,12 @@
 <p align="center">
-  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120" style="vertical-align:middle; margin-right:15px;"><br>
-  <img src="https://svg-badge.vercel.app/api?text=PillPal&color=48C5B6&fontSize=80&fontWeight=900&fontFamily=Nunito" alt="PillPal" />
+  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120" style="vertical-align: middle; margin-right: 12px;" />
 </p>
 
+<h1 align="center" style="font-size: 72px; color: #48C5B6; font-weight: 900; margin-top: 0;">
+  PillPal
+</h1>
+
+---
 ## Overview
 
 PillPal is a lightweight frictionless multi-agent medication-assistant prototype. It uses 3 different agents: 
