@@ -118,7 +118,7 @@ def _build_reminder_notifications(now: datetime) -> List[Notification]:
     events = get_medication_events()
     logger.debug("Loaded %d medication events", len(events))
     window_start = now
-    window_end = now + timedelta(minutes=30)
+    window_end = now + timedelta(minutes=60)
 
     for ev in events:
         try:
@@ -480,8 +480,11 @@ def _llm_personalized_event_advice(
 
         system_prompt = (
             "You are a concise clinical assistant. Given an upcoming event and medications taken within the last 12 hours, "
-            "provide a single short sentence (<=180 characters) of personalized advice about likely effects on wellbeing, "
-            "specific cautions, and what to avoid (e.g., alcohol, driving). Do not include disclaimers."
+            "provide ONE short sentence (<=180 chars) of precautionary advice. "
+            "Err on the side of caution: prefer warnings over reassurance. "
+            "Mention concrete risks (e.g., drowsiness, dehydration, sun sensitivity, bleeding, BP/HR changes) "
+            "and clear avoidances (e.g., alcohol, driving, heavy exercise). "
+            "No disclaimers; be direct and safety‑oriented."
         )
         user_prompt = (
             f"Event:\n"
@@ -490,29 +493,37 @@ def _llm_personalized_event_advice(
             f"- Description: {desc or 'n/a'}\n\n"
             f"Medications taken within 12h:\n"
             f"- {meds_list}\n\n"
-            "Return only the advice sentence. Say if there is no interaction"
+            "Return only the advice sentence. Say if there are any warnings or precautions."
         )
 
-        model = os.getenv("OPENAI_MODEL") or os.getenv("LLM_MODEL") or "gpt-5-nano"
+        model ="gpt-5-nano"
         logger.info("LLM advice: calling model=%s base_url=%s", model, os.getenv("OPENAI_BASE_URL") or "default")
         # Prefer plain string messages for maximum compatibility
         messages = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ]
-        resp = client.chat.completions.create(model=model, messages=messages, max_tokens=180)
-        content = (getattr(resp.choices[0].message, "content", "") or "").strip()
-        # Fallback: some gateways return content chunks as list
-        if not content:
-            try:
-                parts = resp.choices[0].message.content
-                if isinstance(parts, list):
-                    texts = [p.get("text", "") for p in parts if isinstance(p, dict) and p.get("type") == "text"]
-                    content = " ".join([t for t in texts if t]).strip()
-            except Exception:
-                pass
-        if not content:
-            content = "No specific concerns based on provided meds and event."
+        resp = client.chat.completions.create(model=model, messages=messages)
+        content = resp.choices[0].message.content
+
+        # content = (getattr(resp.choices[0].message, "content", "") or "").strip()
+        # # Fallback: some gateways return content chunks as list
+        # if not content:
+        #     try:
+        #         parts = resp.choices[0].message.content
+        #         if isinstance(parts, list):
+        #             texts = [p.get("text", "") for p in parts if isinstance(p, dict) and p.get("type") == "text"]
+        #             content = " ".join([t for t in texts if t]).strip()
+        #     except Exception:
+        #         pass
+        # If model returns nothing or a generic 'no concerns' answer, synthesize a conservative precaution
+        # normalized = (content or "").lower().strip()
+        # if (not content) or ("no specific concerns" in normalized) or ("no concerns" in normalized) or (len(normalized) < 12):
+        #     # Heuristic, concise safety advice (<= 180 chars)
+        #     # Include light personalization from event title and meds when possible
+        #     meds_list_short = ", ".join(medications[:2]) + ("…" if len(medications) > 2 else "") if medications else ""
+        #     hint = f" ({meds_list_short})" if meds_list_short else ""
+        #     content = f"Be cautious{hint}: avoid alcohol; don't drive if drowsy; hydrate; avoid strenuous activity; monitor dizziness/BP/HR; seek help if symptoms worsen."
         logger.info("LLM advice: received content='%s'", content[:120].replace("\n", " "))
         if len(content) > 200:
             content = content[:200].rstrip() + "…"
@@ -579,7 +590,7 @@ def _make_advice_cache_key(
         "desc": (event_description or "")[:256],
         "meds": sorted(medications or []),
         # include model in key to avoid cross-model reuse
-        "model": os.getenv("LLM_MODEL") or os.getenv("OPENAI_MODEL") or "gpt-5",
+        "model": "gpt-5-nano",
         "base_url": os.getenv("OPENAI_BASE_URL") or "default",
     }
     raw = json.dumps(payload, sort_keys=True, ensure_ascii=False)
