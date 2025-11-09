@@ -21,7 +21,8 @@ const Login = () => {
     }
     try {
       setLoading(true);
-      const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
+      const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+      const base = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
       const res = await fetch(`${base}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
