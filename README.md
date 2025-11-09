@@ -1,11 +1,12 @@
-
 <p align="center">
-  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120" style="vertical-align: middle; margin-right: 12px;" />
+  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120"><br>
+  <img src="https://placehold.co/25x25/48C5B6/48C5B6.png" alt="#48C5B6" style="border-radius:50%;">
+  <br>
+  <span style="font-size:56px; font-weight:800;">PillPal</span><br>
+  <sub><code>#48C5B6</code> — PillPal turquoise</sub>
 </p>
 
-<h1 align="center" style="font-size: 72px; color: #48C5B6; font-weight: 900; margin-top: 0;">
-  PillPal
-</h1>
+---
 
 
 ## Overview
@@ -13,7 +14,7 @@
 PillPal is a lightweight frictionless multi-agent medication-assistant prototype. It uses 3 different agents: 
 - 🗓️ **Calendar agent**: monitors 24/7 the changes in the user's weekly calendar, providing notifications if an event potentially conflicts with the user's treatment
 - 💊 **Interaction agent**: takes as input a new medication, either scanned from a photo or entered manually, and queries a drug interaction database via an API. It determines whether any of the drugs the user is taking negatively interact with the new medication and notifies the user in that case. The notification asks the user whether they would like to email their doctor about this interaction. If the user clicks "yes", the agent automatically generates and sends an email to their doctor.
-- 📦 **purchasing agent**: monitors the quantity of each medication that the user has. Once it reaches a threshold (one week's worth), it notifies the user to refill their prescription, and offers to do it for them. If the user accepts, the purchasing agent will interact with the selected pharmacy website to purchase the medication for the user. 
+- 📦 **Purchasing agent**: monitors the quantity of each medication that the user has. Once it reaches a threshold (one week's worth), it notifies the user to refill their prescription, and offers to do it for them. If the user accepts, the purchasing agent will interact with the selected pharmacy website to purchase the medication for the user. 
 
 ## Instructions
 
