@@ -10,8 +10,15 @@ PillPal is a lightweight medication-assistant prototype. It uses 3 different age
 ## Instructions
 
 1. Navigate to https://www.website.com
-2. Login with any username - password combination
-3. Click the "Add Medication" button
-4. Scan your medication box if you have it or enter the details manually
-
+2. Login with any username - password combination.
+4. Click on "My Data".
+5. Enter at minimum Full Name, Email and Doctor Email. The emails need to be valid, you will receive a sample message in Step 12.
+6. Click the back arrow.
+7. Click the "Add Medication" button.
+8. Scan your medication box if you have it or enter the details manually. To showcase the interaction functionality enter a medication that will interact with another (try Ibuprofen).
+9. In the bottom left, ask the agent a question (try "Can I drink alcohol?"). Observe the agent's response.
+10.  Click the "Add Medication" button again.
+11. Repeat step 8, adding a medication that will interact with the previous one (try Lisinopril). This time try entering a low amount (try 3 pills) and enter a high frequency (try Daily) so that it will trigger the purchasing agent.
+12. If you followed Step 10 correctly, observe the notification of low medication, click the "Yes" button if you want the agent to buy medication for you. The agent will interact with the pharmacy website in the backend.
+13. If you entered two medications that interact negatively in Steps 8 and 11, observe the interaction notification. Click the "Email Your Doctor" button to send an email to Doctor Email.
 
