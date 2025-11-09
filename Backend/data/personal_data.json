@@ -34,5 +34,23 @@
     "expiry_date": "06/2028",
     "credit_card_number": "5555555555554444",
     "gender": "Female"
+  },
+  {
+    "user_id": "3",
+    "username": "abc",
+    "password": "def",
+    "full_name": "",
+    "email": "",
+    "age": "",
+    "street": "",
+    "house_number": "",
+    "city": "",
+    "post_code": "",
+    "phone_number": "",
+    "doctor_email": "",
+    "cvv": "",
+    "expiry_date": "",
+    "credit_card_number": "",
+    "gender": ""
   }
 ]
