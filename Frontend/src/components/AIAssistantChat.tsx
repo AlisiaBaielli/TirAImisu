@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bot, Send } from "lucide-react";
+import { Bot, Send, Loader2 } from "lucide-react"; 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -17,33 +17,50 @@ const AIAssistantChat = () => {
     { id: 1, text: "Hello! I'm your medication assistant. How can I help you today?", sender: "assistant" },
   ]);
   const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    const messageText = input.trim();
+    if (!messageText || isSending) return;
+
+    setIsSending(true);
 
     const userMessage: Message = { 
-      id: messages.length + 1, 
-      text: input, 
+      id: Date.now(), 
+      text: messageText, 
       sender: "user" 
     };
     
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
-    // --- Start Real API Call ---
+    // --- THIS IS THE NEW DELAY ---
+    // Wait 400ms before showing "Thinking..."
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    // -----------------------------
+
+    // --- Create a temporary loading message ---
+    const placeholderId = Date.now() + 1;
+    const placeholderMessage: Message = {
+      id: placeholderId,
+      text: "Thinking...",
+      sender: "assistant",
+    };
+    setMessages((prev) => [...prev, placeholderMessage]);
+    // ------------------------------------------
+
     try {
       const userId = localStorage.getItem("userId");
       if (!userId) {
         throw new Error("userId not found in localStorage");
       }
 
-      // Send the request to your backend
       const response = await fetch('http://localhost:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userMessage.text, // Send the message text
+          message: userMessage.text,
           user_id: userId
         })
       });
@@ -54,32 +71,33 @@ const AIAssistantChat = () => {
       }
 
       const data = await response.json();
-      console.log('Data from server:', data);
-      
       const botReply = data.response; 
-      console.log('Parsed bot reply:', botReply);
-
+      
       if (!botReply) {
          throw new Error("Invalid response format from server.");
       }
 
-      // Add the REAL bot response to the chat
-      const assistantMessage: Message = {
-        id: userMessage.id + 1,
-        text: botReply, // Use the real reply
-        sender: "assistant",
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      // --- Update the placeholder with the real message ---
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === placeholderId
+            ? { ...msg, text: botReply } // Update text
+            : msg
+        )
+      );
 
     } catch (error) {
       console.error("Failed to send message:", error);
-      // Show an error message in the chat
-      const errMessage: Message = {
-        id: userMessage.id + 1,
-        text: "Sorry, I'm having trouble connecting to the server.",
-        sender: "assistant",
-      };
-      setMessages((prev) => [...prev, errMessage]);
+      // --- Update the placeholder with an error ---
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === placeholderId
+            ? { ...msg, text: "Sorry, I'm having trouble connecting to the server." }
+            : msg
+        )
+      );
+    } finally {
+      setIsSending(false); 
     }
   };
 
@@ -96,7 +114,6 @@ const AIAssistantChat = () => {
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-        {/* Scrollable messages area fills remaining space */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 custom-scrollbar">
           {messages.map((m) => (
             <div key={m.id} className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}>
@@ -107,15 +124,21 @@ const AIAssistantChat = () => {
                     : "bg-secondary text-secondary-foreground"
                 }`}
               >
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {m.text}
-                </ReactMarkdown>
+                {m.text === "Thinking..." ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Thinking...</span>
+                  </div>
+                ) : (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {m.text}
+                  </ReactMarkdown>
+                )}
               </div>
             </div>
           ))}
           <div ref={endRef} />
         </div>
-        {/* Input bar fixed at bottom of card */}
         <div className="p-3 border-t shrink-0">
           <div className="flex gap-2">
             <Input
@@ -124,9 +147,14 @@ const AIAssistantChat = () => {
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
               placeholder="Ask about medications..."
               className="flex-1"
+              disabled={isSending}
             />
-            <Button size="icon" onClick={handleSend}>
-              <Send className="h-4 w-4" />
+            <Button size="icon" onClick={handleSend} disabled={isSending}>
+              {isSending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
