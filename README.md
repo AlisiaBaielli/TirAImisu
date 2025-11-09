@@ -1,13 +1,7 @@
 <p align="center">
-  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120"><br>
-  <img src="https://placehold.co/25x25/48C5B6/48C5B6.png" alt="#48C5B6" style="border-radius:50%;">
-  <br>
-  <span style="font-size:56px; font-weight:800;">PillPal</span><br>
-  <sub><code>#48C5B6</code> — PillPal turquoise</sub>
+  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="120" style="vertical-align:middle; margin-right:15px;"><br>
+  <img src="https://svg-badge.vercel.app/api?text=PillPal&color=48C5B6&fontSize=80&fontWeight=900&fontFamily=Nunito" alt="PillPal" />
 </p>
-
----
-
 
 ## Overview
 
