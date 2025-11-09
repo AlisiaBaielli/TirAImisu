@@ -103,20 +103,54 @@ const MyData = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    // Save both snake_case and common camelCase keys to keep other components working
-    const compat = {
-      ...formData,
-      doctorEmail: formData.doctor_email,
-      houseNumber: formData.house_number,
-      postalCode: formData.post_code,
-      phoneNumber: formData.phone_number,
-      cardNumber: formData.credit_card_number,
-      cardExpiry: formData.expiry_date,
-      cardCvc: formData.cvv,
-    };
-    localStorage.setItem("userData", JSON.stringify(compat));
-    toast.success("Saved");
+  const handleSave = async () => {
+    const userId = localStorage.getItem("userId") || "1";
+    const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
+    
+    try {
+      // Prepare payload with backend field names
+      const payload = {
+        full_name: formData.full_name,
+        age: formData.age,
+        gender: formData.gender,
+        email: formData.email,
+        street: formData.address,  // map address -> street
+        house_number: formData.house_number,
+        city: formData.city,
+        post_code: formData.post_code,
+        phone_number: formData.phone_number,
+        doctor_email: formData.doctor_email,
+        credit_card_number: formData.credit_card_number,
+        expiry_date: formData.expiry_date,
+        cvv: formData.cvv,
+      };
+
+      const res = await fetch(`${base}/api/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Failed to save (${res.status})`);
+      }
+
+      // Save both snake_case and common camelCase keys to keep other components working
+      const compat = {
+        ...formData,
+        doctorEmail: formData.doctor_email,
+        houseNumber: formData.house_number,
+        postalCode: formData.post_code,
+        phoneNumber: formData.phone_number,
+        cardNumber: formData.credit_card_number,
+        cardExpiry: formData.expiry_date,
+        cardCvc: formData.cvv,
+      };
+      localStorage.setItem("userData", JSON.stringify(compat));
+      toast.success("Saved successfully");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save changes");
+    }
   };
 
   return (
