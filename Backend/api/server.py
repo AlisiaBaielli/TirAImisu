@@ -30,8 +30,11 @@ from Backend.drug_interactions.drug_interactions import (
     get_drug_side_effects,
 )
 
+from Backend.agents.chatbot_agent.agent import ChatAgent
+
 app = FastAPI(title="PillPal API", version="1.0.0")
 logger = logging.getLogger("api")
+chat_agent = ChatAgent()
 
 allowed_origins = [
     "http://localhost:5173",
@@ -534,6 +537,25 @@ def send_email_endpoint(payload: SendEmailRequest):
     except HTTPException:
         raise
 
+class ChatRequest(BaseModel):
+    message: str
+    user_id: str
+
+@app.post("/api/chat")
+def handle_chat(payload: ChatRequest):
+    """
+    Receives a user's message, runs it through the ChatAgent, 
+    and returns the agent's final response
+    """
+    try:
+        response_text = chat_agent.run(
+            text=payload.message,
+            thread_id=payload.user_id
+        )
+        return {"response": response_text}
+    except Exception as e:
+        print(f"Chat agent error: {e}")
+        raise HTTPException(status_code=500, detail="Error processing chat message") 
 
 if __name__ == "__main__":
     import uvicorn

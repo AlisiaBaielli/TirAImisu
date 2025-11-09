@@ -17,19 +17,73 @@ const AIAssistantChat = () => {
   const [input, setInput] = useState("");
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  const handleSend = () => {
+  // Replace your old handleSend in AIAssistantChat.tsx with this:
+  const handleSend = async () => {
     if (!input.trim()) return;
-    const userMessage: Message = { id: messages.length + 1, text: input, sender: "user" };
+
+    const userMessage: Message = { 
+      id: messages.length + 1, 
+      text: input, 
+      sender: "user" 
+    };
+    
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setTimeout(() => {
+
+    // --- Start Real API Call ---
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("user_id not found in localStorage");
+      }
+
+      // Send the request to your backend
+      const response = await fetch('http://localhost:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage.text, // Send the message text
+          user_id: userId
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Server request failed");
+      }
+
+      const data = await response.json();
+      console.log('Data from server:', data);
+      
+      // Use data[1] based on your curl test
+      const botReply = data.response; 
+      console.log('Parsed bot reply:', botReply);
+      
+      // Or, if you fixed your backend to return {"response": ...}
+      // const botReply = data.response;
+
+      if (!botReply) {
+         throw new Error("Invalid response format from server.");
+      }
+
+      // Add the REAL bot response to the chat
       const assistantMessage: Message = {
         id: userMessage.id + 1,
-        text: "Thanks. I will process that and give you info shortly.",
+        text: botReply, // Use the real reply
         sender: "assistant",
       };
       setMessages((prev) => [...prev, assistantMessage]);
-    }, 700);
+
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      // Show an error message in the chat
+      const errMessage: Message = {
+        id: userMessage.id + 1,
+        text: "Sorry, I'm having trouble connecting to the server.",
+        sender: "assistant",
+      };
+      setMessages((prev) => [...prev, errMessage]);
+    }
   };
 
   useEffect(() => {
