@@ -118,7 +118,7 @@ def _build_reminder_notifications(now: datetime) -> List[Notification]:
     events = get_medication_events()
     logger.debug("Loaded %d medication events", len(events))
     window_start = now
-    window_end = now + timedelta(minutes=30)
+    window_end = now + timedelta(minutes=60)
 
     for ev in events:
         try:
