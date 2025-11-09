@@ -428,27 +428,8 @@ def camera_agent_scan(payload: CameraScanRequest):
     dosage = extracted.get("dosage")
     num_pills = extracted.get("num_pills")
 
+    # Do not persist on scan; return extracted fields only. Persistence happens on confirm.
     color_assigned = None
-    if med_name:
-        new_med = {
-            "drug_name": med_name,
-            "strength": dosage or "",
-            "quantity_left": num_pills if isinstance(num_pills, int) else 0,
-            "dose_per_intake": 1,
-            "schedule": {},
-            "start_date": date.today().isoformat(),
-        }
-        try:
-            add_new_medication(payload.user_id, new_med)
-            meds = retrieve_medications(payload.user_id)
-            for m in reversed(meds):
-                if m.get("drug_name") == med_name and (m.get("strength") or "") == (
-                    dosage or ""
-                ):
-                    color_assigned = m.get("color")
-                    break
-        except Exception:
-            pass
 
     return CameraScanResponse(
         medication_name=med_name,

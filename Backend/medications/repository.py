@@ -87,8 +87,13 @@ def get_current_medications() -> List[Medication]:
                 time_hour = parse_time_to_hour(times[0])
             hour_interval = 24
         elif sched_type == "weekly":
-            time_str = schedule.get("time") or "08:00"
-            time_hour = parse_time_to_hour(time_str)
+            # Support either 'time' (string) or 'times' (list) for weekly
+            times = schedule.get("times") or []
+            if isinstance(times, list) and times:
+                time_hour = parse_time_to_hour(times[0])
+            else:
+                time_str = schedule.get("time") or "08:00"
+                time_hour = parse_time_to_hour(time_str)
             hour_interval = 168
         else:
             # Fallback for as_needed etc.
@@ -232,8 +237,13 @@ def get_medication_events() -> List[Dict[str, Any]]:
                 time_hour = parse_time_to_hour(times[0])
             hour_interval = 24
         elif sched_type == "weekly":
-            time_str = schedule.get("time") or "08:00"
-            time_hour = parse_time_to_hour(time_str)
+            # Support either 'time' (string) or 'times' (list) for weekly
+            times = schedule.get("times") or []
+            if isinstance(times, list) and times:
+                time_hour = parse_time_to_hour(times[0])
+            else:
+                time_str = schedule.get("time") or "08:00"
+                time_hour = parse_time_to_hour(time_str)
             hour_interval = 168
         else:
             time_hour = 8
@@ -314,6 +324,19 @@ def upsert_scanned_medication(
         # Update existing
         current_qty = int(meds[idx].get("quantity_left", 0) or 0)
         meds[idx]["quantity_left"] = current_qty + qty_to_add
+        # If existing schedule is empty/missing and caller provided time/frequency, set it now
+        existing_sched = meds[idx].get("schedule") or {}
+        if (not existing_sched or (not existing_sched.get("times") and not existing_sched.get("time"))) and (time is not None or hour_interval is not None):
+            inferred_hour_interval = int(hour_interval) if hour_interval is not None else 24
+            inferred_time = int(time) if time is not None else 8
+            meds[idx]["schedule"] = (
+                {"type": "weekly", "day": "Sunday", "time": f"{inferred_time:02d}:00"}
+                if inferred_hour_interval >= 168
+                else {"type": "daily", "times": [f"{inferred_time:02d}:00"]}
+            )
+        # Start date: set if missing and provided
+        if not meds[idx].get("start_date") and start_date:
+            meds[idx]["start_date"] = start_date
         user_entry["medications"] = meds
         _save_json(json_path, doc)
     else:
