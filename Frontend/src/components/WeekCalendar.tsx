@@ -258,7 +258,7 @@ const WeekCalendar = () => {
       </CardHeader>
 
       <CardContent className="flex-1 p-0 min-h-0 flex flex-col">
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar">
             <div className="min-w-[800px]" style={{ position: "relative" }}>
               <div className="grid grid-cols-8 border-b sticky top-0 bg-card z-10">
                 <div className="p-2 border-r text-xs font-medium text-muted-foreground">
