@@ -20,7 +20,8 @@ const CurrentMedicationsList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
+  const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+  const base = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
 
   const load = useCallback(async () => {
     try {

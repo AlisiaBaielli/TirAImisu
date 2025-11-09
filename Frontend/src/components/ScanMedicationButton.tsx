@@ -17,7 +17,8 @@ const ScanMedicationButton = () => {
   // Top-center floating loading
   const [checking, setChecking] = useState(false);
 
-  const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    const base = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
 
   const handleScanConfirm = async (data: NewMedicationPayload) => {
     setScanOpen(false);

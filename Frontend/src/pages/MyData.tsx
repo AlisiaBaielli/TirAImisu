@@ -63,7 +63,8 @@ const MyData = () => {
     const userId = localStorage.getItem("userId") || "1";
     const load = async () => {
       try {
-        const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
+        const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+        const base = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
         const res = await fetch(`${base}/api/users/${userId}`);
         if (!res.ok) throw new Error(`Failed to load user (${res.status})`);
         const data = await res.json();
@@ -105,7 +106,8 @@ const MyData = () => {
 
   const handleSave = async () => {
     const userId = localStorage.getItem("userId") || "1";
-    const base = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    const raw = (import.meta as any)?.env?.VITE_BACKEND_URL;
+    const base = raw ? String(raw).replace(/\/$/, "") : ""; // empty string fallback
     
     try {
       // Prepare payload with backend field names
