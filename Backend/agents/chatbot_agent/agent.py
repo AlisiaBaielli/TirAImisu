@@ -28,6 +28,7 @@ SYSTEM_PROMPT = SystemMessage(
         "- You can check the side effects of a tool using `check_side_effects(drug)`.\n"
         "- If the user asks about interactions, prefer calling the interaction tool rather than guessing.\n"
         "- If no interaction is found, clearly say so.\n"
+        "- **Format your final response using Markdown.** Use bolding (**) for drug names and newlines for lists or separate points."
     )
 )
 
