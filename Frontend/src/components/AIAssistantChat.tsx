@@ -19,6 +19,8 @@ const AIAssistantChat = () => {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const endRef = useRef<HTMLDivElement | null>(null);
+  const [hovered, setHovered] = useState(false);
+  const EXPAND_PX = 140;
 
   const handleSend = async () => {
     const messageText = input.trim();
@@ -106,7 +108,21 @@ const AIAssistantChat = () => {
   }, [messages]);
 
   return (
-    <Card className="flex flex-col h-full rounded-xl shadow bg-white">
+    <Card
+      className="flex flex-col h-full rounded-xl shadow bg-white transition-all duration-300 ease-out"
+      style={
+        hovered
+          ? {
+              height: `calc(100% + ${EXPAND_PX}px)`,
+              marginTop: `-${EXPAND_PX}px`,
+              zIndex: 40,
+              position: "relative",
+            }
+          : { height: "100%", marginTop: 0, position: "relative", zIndex: 1 }
+      }
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <CardHeader className="pb-2 shrink-0">
         <div className="flex w-full items-center justify-center gap-2">
           <Bot className="h-5 w-5 text-primary" />
