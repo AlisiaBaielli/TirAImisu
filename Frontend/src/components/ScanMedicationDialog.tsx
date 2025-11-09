@@ -115,45 +115,13 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
     }
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!manualEntry.name || !manualEntry.dosage) {
       toast.error("Please enter medication name and dosage");
       return;
     }
-    try {
-      const base = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
-      const name = `${manualEntry.name.trim()} ${manualEntry.dosage.trim()}`.trim();
-      const hour = (() => {
-        const [h] = manualEntry.time.split(":");
-        const n = parseInt(h || "8", 10);
-        return Number.isNaN(n) ? 8 : Math.max(0, Math.min(23, n));
-      })();
-      const hourInterval = manualEntry.frequency === "weekly" ? 168 : 24;
-      const body = {
-        name,
-        time: hour,
-        hour_interval: hourInterval,
-        description: "Added via scan",
-        start_date: manualEntry.startDate || undefined,
-        end_date: manualEntry.endDate || undefined,
-        occurrences: manualEntry.numberOfPills ? parseInt(manualEntry.numberOfPills, 10) || undefined : undefined,
-        photo: photo ?? undefined,
-      };
-      const res = await fetch(`${base}/api/medications`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) throw new Error(`Failed to add medication (${res.status})`);
-      toast.success("Medication added");
-      window.dispatchEvent(new Event("medications:updated"));
-      try {
-        await fetch(`${base}/api/events-calendar/events/refresh`, { method: "POST" });
-      } catch {}
-      onConfirm(manualEntry);
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed to add medication");
-    }
+    // Do not call backend here — ScanMedicationButton will persist + run interaction checks.
+    onConfirm(manualEntry);
   };
 
   return (
@@ -166,144 +134,86 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
 
         <div className="space-y-6 py-4">
           {/* Camera / Photo area */}
-            <div className="flex flex-col items-center relative">
-              {!cameraActive && !photo && !scanning && (
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="h-32 w-32 rounded-full"
-                  onClick={handleCameraClick}
-                  disabled={scanning}
-                >
-                  <Camera className="h-12 w-12" />
-                </Button>
-              )}
+          <div className="flex flex-col items-center relative">
+            {!cameraActive && !photo && !scanning && (
+              <Button
+                variant="outline"
+                size="lg"
+                className="h-32 w-32 rounded-full"
+                onClick={handleCameraClick}
+                disabled={scanning}
+              >
+                <Camera className="h-12 w-12" />
+              </Button>
+            )}
 
-              {cameraActive && (
-                <div className="flex flex-col items-center gap-2 relative">
-                  <video
-                    ref={videoRef}
-                    className="rounded-lg border"
-                    style={{ width: 220, height: 160 }}
-                  />
-                  <div className="flex gap-2 mt-2">
-                    <Button size="sm" onClick={handleTakePhoto} disabled={scanning}>
-                      {scanning ? "Scanning..." : "Take Photo"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={handleCancelCamera} disabled={scanning}>
-                      Cancel
-                    </Button>
-                  </div>
-                  <canvas ref={canvasRef} style={{ display: "none" }} />
-                  {scanning && (
-                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-lg">
-                      <Loader2 className="h-6 w-6 animate-spin text-white mb-2" />
-                      <p className="text-xs text-white tracking-wide animate-pulse">
-                        Processing image...
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {photo && (
-                <div className="flex flex-col items-center gap-2 relative">
-                  <img
-                    src={photo}
-                    alt="Medication"
-                    className="rounded-lg border w-32 h-32 object-cover"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setPhoto(null)}
-                    disabled={scanning}
-                  >
-                    Retake
+            {cameraActive && (
+              <div className="flex flex-col items-center gap-2 relative">
+                <video ref={videoRef} className="rounded-lg border" style={{ width: 220, height: 160 }} />
+                <div className="flex gap-2 mt-2">
+                  <Button size="sm" onClick={handleTakePhoto} disabled={scanning}>
+                    {scanning ? "Scanning..." : "Take Photo"}
                   </Button>
-                  {scanning && (
-                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-lg">
-                      <Loader2 className="h-6 w-6 animate-spin text-white mb-2" />
-                      <p className="text-xs text-white tracking-wide animate-pulse">
-                        Processing...
-                      </p>
-                    </div>
-                  )}
+                  <Button size="sm" variant="outline" onClick={handleCancelCamera} disabled={scanning}>
+                    Cancel
+                  </Button>
                 </div>
-              )}
+                <canvas ref={canvasRef} style={{ display: "none" }} />
+                {scanning && (
+                  <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-lg">
+                    <Loader2 className="h-6 w-6 animate-spin text-white mb-2" />
+                    <p className="text-xs text-white tracking-wide animate-pulse">Processing image...</p>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {scanning && !cameraActive && !photo && (
-                <div className="h-32 w-32 flex flex-col items-center justify-center rounded-full border">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
-                  <p className="text-xs text-muted-foreground animate-pulse">Processing...</p>
-                </div>
-              )}
-            </div>
+            {photo && (
+              <div className="flex flex-col items-center gap-2 relative">
+                <img src={photo} alt="Medication" className="rounded-lg border w-32 h-32 object-cover" />
+                <Button size="sm" variant="outline" onClick={() => setPhoto(null)} disabled={scanning}>
+                  Retake
+                </Button>
+              </div>
+            )}
+
+            {scanning && !cameraActive && !photo && (
+              <div className="h-32 w-32 flex flex-col items-center justify-center rounded-full border">
+                <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
+                <p className="text-xs text-muted-foreground animate-pulse">Processing...</p>
+              </div>
+            )}
+          </div>
 
           {/* Manual Entry */}
           <div className="space-y-4">
             <h3 className="font-semibold text-sm">Manual Entry</h3>
             <div className="space-y-2">
               <Label htmlFor="name">Medication Name</Label>
-              <Input
-                id="name"
-                value={manualEntry.name}
-                onChange={(e) => setManualEntry({ ...manualEntry, name: e.target.value })}
-                placeholder="e.g., Aspirin"
-                disabled={scanning}
-              />
+              <Input id="name" value={manualEntry.name} onChange={(e) => setManualEntry({ ...manualEntry, name: e.target.value })} placeholder="e.g., Aspirin" disabled={scanning} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="dosage">Dosage</Label>
-              <Input
-                id="dosage"
-                value={manualEntry.dosage}
-                onChange={(e) => setManualEntry({ ...manualEntry, dosage: e.target.value })}
-                placeholder="e.g., 100mg"
-                disabled={scanning}
-              />
+              <Input id="dosage" value={manualEntry.dosage} onChange={(e) => setManualEntry({ ...manualEntry, dosage: e.target.value })} placeholder="e.g., 100mg" disabled={scanning} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="pills">Number of Pills</Label>
-              <Input
-                id="pills"
-                type="number"
-                value={manualEntry.numberOfPills}
-                onChange={(e) => setManualEntry({ ...manualEntry, numberOfPills: e.target.value })}
-                placeholder="1"
-                disabled={scanning}
-              />
+              <Input id="pills" type="number" value={manualEntry.numberOfPills} onChange={(e) => setManualEntry({ ...manualEntry, numberOfPills: e.target.value })} placeholder="1" disabled={scanning} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate">Start Date</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={manualEntry.startDate}
-                  onChange={(e) => setManualEntry({ ...manualEntry, startDate: e.target.value })}
-                  disabled={scanning}
-                />
+                <Input id="startDate" type="date" value={manualEntry.startDate} onChange={(e) => setManualEntry({ ...manualEntry, startDate: e.target.value })} disabled={scanning} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="endDate">End Date (Optional)</Label>
-                <Input
-                  id="endDate"
-                  type="date"
-                  value={manualEntry.endDate}
-                  onChange={(e) => setManualEntry({ ...manualEntry, endDate: e.target.value })}
-                  disabled={scanning}
-                />
+                <Input id="endDate" type="date" value={manualEntry.endDate} onChange={(e) => setManualEntry({ ...manualEntry, endDate: e.target.value })} disabled={scanning} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="frequency">Frequency</Label>
-                <Select
-                  value={manualEntry.frequency}
-                  onValueChange={(value) => setManualEntry({ ...manualEntry, frequency: value })}
-                  disabled={scanning}
-                >
+                <Select value={manualEntry.frequency} onValueChange={(value) => setManualEntry({ ...manualEntry, frequency: value })} disabled={scanning}>
                   <SelectTrigger id="frequency">
                     <SelectValue placeholder="Select frequency" />
                   </SelectTrigger>
@@ -315,13 +225,7 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
               </div>
               <div className="space-y-2">
                 <Label htmlFor="time">Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={manualEntry.time}
-                  onChange={(e) => setManualEntry({ ...manualEntry, time: e.target.value })}
-                  disabled={scanning}
-                />
+                <Input id="time" type="time" value={manualEntry.time} onChange={(e) => setManualEntry({ ...manualEntry, time: e.target.value })} disabled={scanning} />
               </div>
             </div>
           </div>

@@ -17,8 +17,14 @@ load_dotenv()
 # Initialize OpenAI client lazily and safely (do not exit the host process)
 client: Optional[openai.OpenAI] = None
 try:
-    if os.environ.get("OPENAI_API_KEY"):
-        client = openai.OpenAI()
+    api_key = os.environ.get("OPENAI_API_KEY")
+    base_url = os.environ.get("OPENAI_BASE_URL")
+    
+    if api_key:
+        if base_url:
+            client = openai.OpenAI(api_key=api_key, base_url=base_url)
+        else:
+            client = openai.OpenAI(api_key=api_key)
     else:
         print("Warning: OPENAI_API_KEY not found. LLM interaction checks will be skipped.")
 except Exception as e:
@@ -123,7 +129,7 @@ def check_interaction_with_llm(interaction_text: str, drug_a_name: str, drug_b_n
     ]
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -195,7 +201,7 @@ def synthesize_reports(reports: List[InteractionReport], drug_a: str, drug_b: st
             print("LLM client not initialized; skipping synthesis.")
             return None
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-5-nano",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}

@@ -13,7 +13,8 @@
             "08:00"
           ]
         },
-        "start_date": "2025-11-03"
+        "start_date": "2025-11-03",
+        "color": "med-blue"
       },
       {
         "drug_name": "Vitamin D",
@@ -23,13 +24,14 @@
         "schedule": {
           "type": "daily",
           "times": [
-            "12:00"
+            "22:00"
           ]
         },
-        "start_date": "2025-11-04"
+        "start_date": "2025-11-04",
+        "color": "med-green"
       },
       {
-        "drug_name": "Metformin",
+        "drug_name": "Lisinopril",
         "strength": "500mg",
         "quantity_left": 30,
         "dose_per_intake": 1,
@@ -39,20 +41,8 @@
             "18:00"
           ]
         },
-        "start_date": "2025-11-05"
-      },
-      {
-        "drug_name": "Zyrtec 10 mg",
-        "strength": "",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "09:00"
-          ]
-        },
-        "start_date": "2025-11-08"
+        "start_date": "2025-11-05",
+        "color": "med-orange"
       },
       {
         "drug_name": "TestMed",
@@ -65,7 +55,8 @@
             "21:00"
           ]
         },
-        "start_date": "2025-11-08"
+        "start_date": "2025-11-08",
+        "color": "med-purple"
       }
     ]
   },

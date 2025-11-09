@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { format, addDays, startOfWeek, isSameDay, parseISO } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-// Medication type for color mapping
 interface Medication {
   id: string | number;
   name: string;
@@ -22,11 +21,11 @@ interface CalendarChip {
   id: string | number;
   name: string;
   time: string;
-  color: string;
+  color: string; // med-* string
   frequency: string;
   startDate: string;
-  duration?: number; // duration in minutes
-  startMinutes?: number; // minutes from start of hour
+  duration?: number;
+  startMinutes?: number;
 }
 
 const WeekCalendar = () => {
@@ -35,16 +34,13 @@ const WeekCalendar = () => {
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
 
   const [events, setEvents] = useState<ApiEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedMed, setSelectedMed] = useState<CalendarChip | null>(null);
-
-  // Medications for color mapping
   const [medications, setMedications] = useState<Medication[]>([]);
 
   const baseUrl = (import.meta as any)?.env?.VITE_BACKEND_URL ?? "http://localhost:8000";
 
-  // Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
@@ -67,7 +63,6 @@ const WeekCalendar = () => {
     }
   };
 
-  // Fetch medications for color mapping
   const fetchMedications = async () => {
     try {
       const userId = localStorage.getItem("userId") || "1";
@@ -81,55 +76,51 @@ const WeekCalendar = () => {
     }
   };
 
-  const refreshEvents = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const r = await fetch(`${baseUrl}/api/events-calendar/events/refresh`, { method: "POST" });
-      if (!r.ok) throw new Error("Failed to refresh events");
-      await fetchEvents();
-    } catch (e: any) {
-      setError(e?.message ?? "Failed to refresh events");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchEvents();
     fetchMedications();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Map medication names to their colors
   const medColorMap = useMemo(() => {
     const map: Record<string, string> = {};
-    medications.forEach((med) => {
-      map[med.name] = med.color;
+    medications.forEach((m) => {
+      map[m.name] = m.color || "med-blue";
     });
     return map;
   }, [medications]);
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
-  // Convert color name to Tailwind class for schedule display
-  const colorToTailwind = (color: string) => {
-    switch (color) {
-      case "med-blue":
-        return "bg-blue-500";
-      case "med-green":
-        return "bg-green-500";
-      case "med-orange":
-        return "bg-orange-500";
-      case "med-purple":
-        return "bg-purple-500";
-      case "med-pink":
-        return "bg-pink-500";
-      case "med-yellow":
-        return "bg-yellow-500";
-      default:
-        return "bg-gray-400";
+  // Helper: assign columns for events that may overlap.
+  const layoutColumns = (items: CalendarChip[]) => {
+    // sort by startMinutes ascending
+    const sorted = [...items].sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
+    const columns: { end: number }[] = [];
+    const placed: { event: CalendarChip; col: number }[] = [];
+
+    for (const ev of sorted) {
+      const start = ev.startMinutes ?? 0;
+      const end = start + (ev.duration ?? 30);
+      // find a column where this event doesn't overlap the last item
+      let placedCol = -1;
+      for (let ci = 0; ci < columns.length; ci++) {
+        if (start >= columns[ci].end) {
+          placedCol = ci;
+          columns[ci].end = end;
+          break;
+        }
+      }
+      if (placedCol === -1) {
+        // new column
+        columns.push({ end });
+        placedCol = columns.length - 1;
+      }
+      placed.push({ event: ev, col: placedCol });
     }
+    const colsCount = Math.max(1, columns.length);
+    // produce mapping with col index and total cols
+    return placed.map((p) => ({ ...p.event, col: p.col, cols: colsCount }));
   };
 
   return (
@@ -137,7 +128,7 @@ const WeekCalendar = () => {
       <CardHeader className="pb-2 shrink-0">
         <div className="flex items-center justify-between gap-2">
           <CardTitle className="text-lg font-medium">7-Day Medication Schedule</CardTitle>
-          <Button variant="outline" size="sm" onClick={refreshEvents} disabled={loading}>
+          <Button variant="outline" size="sm" onClick={fetchEvents} disabled={loading}>
             {loading ? "Refreshing..." : "Refresh"}
           </Button>
         </div>
@@ -146,7 +137,6 @@ const WeekCalendar = () => {
       <CardContent className="flex-1 p-0 min-h-0 flex flex-col">
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="min-w-[800px]" style={{ position: "relative" }}>
-            {/* Day headers */}
             <div className="grid grid-cols-8 border-b sticky top-0 bg-card z-10">
               <div className="p-2 border-r text-xs font-medium text-muted-foreground">Time</div>
               {days.map((day, index) => {
@@ -165,72 +155,73 @@ const WeekCalendar = () => {
               })}
             </div>
 
-            {/* Hour rows */}
             {hours.map((hour) => (
               <div key={hour} className="grid grid-cols-8 border-b min-h-[60px]" style={{ overflow: "visible" }}>
                 <div className="p-2 border-r text-xs text-muted-foreground">
                   {hour.toString().padStart(2, "0")}:00
                 </div>
                 {days.map((day, dayIndex) => {
-                  const hourEvents: CalendarChip[] = events
+                  // collect events that start in this hour & day
+                  const rawEvents: CalendarChip[] = events
                     .filter((ev) => {
                       const start = parseISO(ev.start?.date_time ?? "");
-                      const end = parseISO(ev.end?.date_time ?? "");
                       if (!isSameDay(start, day)) return false;
-                      
-                      // Show event in the hour row where it starts
-                      const startHour = start.getHours();
-                      return startHour === hour;
+                      return start.getHours() === hour;
                     })
                     .map((ev, idx) => {
                       const start = parseISO(ev.start?.date_time ?? "");
                       const end = parseISO(ev.end?.date_time ?? "");
-                      
-                      // Use medication color if available, else fallback
-                      const medColor = medColorMap[ev.title ?? ""] ?? "";
-                      const colorClass = colorToTailwind(medColor);
-                      
-                      // Calculate duration in minutes
+                      const medColor = medColorMap[ev.title ?? ""] ?? "med-blue";
                       const durationMs = end.getTime() - start.getTime();
-                      const durationMinutes = Math.max(30, Math.round(durationMs / (1000 * 60))); // Minimum 30 minutes for visibility
-                      
-                      // Calculate minutes from start of hour (for positioning)
+                      const durationMinutes = Math.max(30, Math.round(durationMs / 60000));
                       const startMinutes = start.getMinutes();
                       return {
                         id: ev.id ?? `${dayIndex}-${hour}-${idx}`,
                         name: ev.title ?? "Event",
                         time: format(start, "HH:mm"),
-                        color: colorClass,
+                        color: medColor,
                         frequency: "once",
                         startDate: format(start, "yyyy-MM-dd"),
                         duration: durationMinutes,
-                        startMinutes: startMinutes,
-                      };
+                        startMinutes,
+                      } as CalendarChip;
                     });
 
-                  const isToday = format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
+                  // layout into columns to avoid overlap (per cell)
+                  const placed = layoutColumns(rawEvents);
 
+                  const isToday = format(day, "yyyy-MM-dd") === format(today, "yyyy-MM-dd");
                   return (
                     <div
                       key={dayIndex}
                       className={`p-1 border-r relative ${isToday ? "bg-primary/5" : ""}`}
                       style={{ minHeight: "60px", overflow: "visible" }}
                     >
-                      {hourEvents.map((event) => {
-                        // Calculate height: each hour is 60px, so duration in minutes / 60 * 60px
-                        const hourHeight = 60; // 60px per hour row
+                      {placed.map((event) => {
+                        const hourHeight = 60;
                         const heightPx = (event.duration! / 60) * hourHeight;
                         const topOffsetPx = (event.startMinutes! / 60) * hourHeight;
-                        
+                        const cols = event.cols ?? 1;
+                        const colIndex = event.col ?? 0;
+                        const gapPx = 6; // gap between columns in px
+                        const totalGap = gapPx * (cols - 1);
+                        const containerWidth = 100; // percent
+                        // compute width in percent minus gaps (approx)
+                        const widthPercent = Math.max(10, (100 / cols));
+                        const leftPercent = (colIndex * (100 / cols));
                         return (
                           <div
                             key={event.id}
-                            className={`${event.color} text-white rounded px-2 py-1 text-xs font-medium cursor-pointer transition hover:opacity-90 hover:shadow-lg absolute left-1 right-1 z-10 flex flex-col justify-start`}
+                            className="text-white rounded px-2 py-1 text-xs font-medium cursor-pointer transition hover:opacity-90 hover:shadow-lg absolute z-10 flex flex-col justify-start"
                             style={{
-                              top: `${topOffsetPx + 4}px`, // +4px for padding
-                              height: `${Math.max(heightPx - 8, 20)}px`, // -8px to account for padding, min 20px
-                              minHeight: "20px", // Minimum height for readability
-                              overflow: "hidden", // Prevent text overflow
+                              top: `${topOffsetPx + 4}px`,
+                              height: `${Math.max(heightPx - 8, 20)}px`,
+                              minHeight: "20px",
+                              overflow: "hidden",
+                              left: `${leftPercent}%`,
+                              width: `calc(${widthPercent}% - ${totalGap / cols}px)`,
+                              backgroundColor: `hsl(var(--${event.color}))`,
+                              marginRight: `${gapPx}px`,
                             }}
                             onClick={() => setSelectedMed(event)}
                           >
