@@ -50,12 +50,46 @@ def retrieve_medications(user_id: str) -> List[Dict[str, Any]]:
 def add_new_medication(user_id: str, new_medication: Dict[str, Any]) -> bool:
     all_med_data = _read_json(MEDICATION_FILE)
 
+    # Find or create user entry
+    user_entry = None
     for user_data in all_med_data:
         if user_data.get("user_id") == user_id:
-            if "medications" not in user_data or not isinstance(
-                user_data.get("medications"), list
-            ):
-                user_data["medications"] = []
-            user_data["medications"].append(new_medication)
+            user_entry = user_data
+            break
+    if user_entry is None:
+        user_entry = {"user_id": user_id, "medications": []}
+        all_med_data.append(user_entry)
 
+    if "medications" not in user_entry or not isinstance(user_entry.get("medications"), list):
+        user_entry["medications"] = []
+
+    meds = user_entry["medications"]
+    # Normalize keys
+    new_name = str(new_medication.get("drug_name", "")).strip().lower()
+    new_strength = str(new_medication.get("strength", "")).strip().lower()
+    new_qty = int(new_medication.get("quantity_left", 0) or 0)
+
+    # Try to find existing medication with same name + strength
+    found_idx = None
+    for i, m in enumerate(meds):
+        if (
+            str(m.get("drug_name", "")).strip().lower() == new_name
+            and str(m.get("strength", "")).strip().lower() == new_strength
+        ):
+            found_idx = i
+            break
+
+    if found_idx is not None:
+        # Renewal: increment quantity_left
+        current_qty = int(meds[found_idx].get("quantity_left", 0) or 0)
+        meds[found_idx]["quantity_left"] = current_qty + new_qty
+    else:
+        # New medication: append as-is (ensure required fields)
+        if "dose_per_intake" not in new_medication:
+            new_medication["dose_per_intake"] = 1
+        if "schedule" not in new_medication:
+            new_medication["schedule"] = {}
+        meds.append(new_medication)
+
+    user_entry["medications"] = meds
     return _write_to_json(MEDICATION_FILE, all_med_data)

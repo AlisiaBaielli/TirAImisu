@@ -5,7 +5,7 @@
       {
         "drug_name": "Aspirin",
         "strength": "100mg",
-        "quantity_left": 30,
+        "quantity_left": 60,
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
