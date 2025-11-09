@@ -185,7 +185,7 @@ def send_email_to_doctor(user_id: int, content: str) -> Dict[str, Any]:
         return {
             "success": True,
             "message_id": resp_json.get("id"),
-            "to": [doctor_email],
+            "to": ["pranavsrv10@gmail.com"],
             "from": user_email,
             "subject": subject,
         }
