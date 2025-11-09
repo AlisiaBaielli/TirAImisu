@@ -1,6 +1,8 @@
 <p align="center">
-  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="80" style="vertical-align:middle; margin-right:10px;">
-  <span style="font-size:42px; font-weight:700; color:#4CC9F0; vertical-align:middle;">PillPal</span>
+  <img src="Frontend/src/assets/logo.png" alt="PillPal Logo" width="110" style="vertical-align:middle; margin-right:15px;">
+  <span style="font-size:64px; font-weight:800; color:#48C5B6; vertical-align:middle; font-family: 'Nunito', sans-serif;">
+    PillPal
+  </span>
 </p>
 
 ---
