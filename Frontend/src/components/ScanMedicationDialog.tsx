@@ -234,6 +234,16 @@ const ScanMedicationDialog = ({ open, onOpenChange, onConfirm }: ScanMedicationD
             {scanning ? "Processing..." : "Confirm"}
           </Button>
         </DialogFooter>
+        {scanning && (
+            <div className="fixed inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+              <div className="bg-white rounded-full p-6 shadow-xl flex flex-col items-center justify-center animate-fade-in">
+                <Loader2 className="h-10 w-10 text-primary animate-spin mb-2" />
+                <p className="text-sm font-medium text-gray-600 animate-pulse">Scanning your pill...</p>
+              </div>
+            </div>
+          )}
+
+
       </DialogContent>
     </Dialog>
   );

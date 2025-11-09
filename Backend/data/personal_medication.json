@@ -5,7 +5,7 @@
       {
         "drug_name": "Aspirin",
         "strength": "100mg",
-        "quantity_left": 63,
+        "quantity_left": 5,
         "dose_per_intake": 1,
         "schedule": {
           "type": "daily",
@@ -15,20 +15,6 @@
         },
         "start_date": "2025-11-03",
         "color": "med-blue"
-      },
-      {
-        "drug_name": "Vitamin D",
-        "strength": "2000IU",
-        "quantity_left": 30,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "22:00"
-          ]
-        },
-        "start_date": "2025-11-04",
-        "color": "med-green"
       },
       {
         "drug_name": "Lisinopril",
@@ -43,41 +29,6 @@
         },
         "start_date": "2025-11-05",
         "color": "med-orange"
-      },
-      {
-        "drug_name": "TestMed",
-        "strength": "10mg",
-        "quantity_left": 5,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily",
-          "times": [
-            "21:00"
-          ]
-        },
-        "start_date": "2025-11-08",
-        "color": "med-purple"
-      },
-      {
-        "drug_name": "ibuprofen",
-        "strength": "100mg",
-        "quantity_left": 3,
-        "dose_per_intake": 1,
-        "schedule": {
-          "type": "daily"
-        },
-        "start_date": "2025-11-09",
-        "end_date": null,
-        "color": "med-pink"
-      },
-      {
-        "drug_name": "Ibuprofen",
-        "strength": "200 mg",
-        "quantity_left": 50,
-        "dose_per_intake": 1,
-        "schedule": {},
-        "start_date": "2025-11-09",
-        "color": "med-yellow"
       }
     ]
   },
