@@ -18,19 +18,19 @@ PillPal is your smart buddy that ensures you never miss your medication again, n
 
 1. Navigate to https://morbifically-unsulphonated-elia.ngrok-free.dev 
    
-2. For demonstration purposes, login with username: jan.jansen - password: password. This profile already has medication loaded which will be useful for our demo. You could also create your own username - passsword combination but the profile will be empty by default. 
+2. For demonstration purposes, login with **username: jan.jansen - password: password**. This profile already has medication loaded which will be useful for our demo. You could also create your own username - passsword combination but the profile will be empty by default. 
 
-3. Click the "Add Medication" button.
+3. Click the *"Add Medication"* button.
 
-4. Scan your medication box if you have it or enter the details manually. To showcase the interaction functionality enter a medication that will interact with another (try Ibuprofen).
+4. Scan your medication box if you have it or enter the details manually. To showcase the interaction functionality enter a medication that will interact with another (try *Ibuprofen*).
    
-5. Try entering a low amount (try 3 pills) and enter a high frequency (try Daily) so that it will trigger the purchasing agent. 
+5. Try entering a low amount (try 3 pills) and enter a high frequency (try *Every Day*) so that it will trigger the purchasing agent. 
    
-6. In the bottom left, ask the agent a question (try "Can I drink alcohol?"). Observe the agent's response.
+6. In the bottom left, ask the agent a question (try *"Can I drink alcohol?"*). Observe the agent's response.
    
-7. Observe the notification of low medication, click the "Yes" button if you want the agent to buy medication for you. The agent will interact with the pharmacy website in the backend.
+7. Observe the notification of low medication, click the *"Yes"* button if you want the agent to buy medication for you. The agent will interact with the pharmacy website in the backend.
    
-8. If you entered two medications that interact negatively in Steps 4 and 5, observe the interaction notification. Click the "Email Your Doctor" button to send an email to the doctor's email. Unfortunately the Resend module requires that the receiver be the same email used to sign up for the API key, this can only be circumvented with a verified domain which at this time we didn't setup. 
+8. If you entered two medications that interact negatively in Steps 4 and 5, observe the interaction notification. Click the *"Email Your Doctor"* button to send an email to the doctor's email. Unfortunately the Resend module requires that the receiver be the same email used to sign up for the API key, this can only be circumvented with a verified domain which at this time we didn't setup. 
 
 ## Running the Development Server
 
